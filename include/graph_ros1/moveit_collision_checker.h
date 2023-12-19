@@ -34,31 +34,80 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace graph_core
 {
 
+/**
+ * @class MoveitCollisionChecker
+ * @brief Implementation of CollisionCheckerBase using MoveIt! library for collision checking.
+ *
+ * This class inherits from CollisionCheckerBase and provides collision checking functionality
+ * using the MoveIt! library. It interacts with a MoveIt! PlanningScene to perform collision checks
+ * for a specified joint group.
+ */
 class MoveitCollisionChecker: public CollisionCheckerBase
 {
 protected:
+  /**
+   * @brief planning_scene_ Pointer to the MoveIt! PlanningScene.
+   */
   planning_scene::PlanningScenePtr planning_scene_;
-  collision_detection::CollisionRequest req_;
-  collision_detection::CollisionResult res_;
+
+  /**
+   * @brief state_ Pointer to the current state of the robot (robot_state::RobotState) used for collision checking..
+   */
   robot_state::RobotStatePtr state_;
+
+  /**
+   * @brief group_name_  Name of the joint group to consider for collision checking.
+   */
   std::string group_name_;
 
+  /**
+   * @brief jmg_ Pointer to the group of joints of the robot identified by the group name.
+   */
   const moveit::core::JointModelGroup* jmg_;
+
+  /**
+   * @brief joint_names_ Names of active joints in the group.
+   */
   std::vector<std::string> joint_names_;
+
+  /**
+   * @brief joint_models_ Pointers to active joints in the group.
+   */
   std::vector<const moveit::core::JointModel*> joint_models_;
+
+  /**
+   * @brief mimic_joint_models_ Pointers to mimic joints in the group.
+   * Mimic joints are typically unactuated joints that are constrained to follow the motion of another joint.
+   */
   std::vector<const moveit::core::JointModel*> mimic_joint_models_;
 
+  /**
+   * @brief Pointer to a TraceLogger instance for logging.
+   *
+   * This member variable represents a pointer to a TraceLogger instance, allowing
+   * to perform logging operations. TraceLogger is a part of the cnr_logger library.
+   * Ensure that the logger is properly configured and available for use.
+   */
   const cnr_logger::TraceLoggerPtr& logger_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  /**
+   * @brief Constructor for MoveitCollisionChecker class.
+   *
+   * @param planning_scene Pointer to the MoveIt! PlanningScene.
+   * @param group_name Name of the joint group for collision checking.
+   * @param logger Pointer to the logger for logging messages.
+   * @param min_distance Minimum distance for collision checking (default is 0.01).
+   */
   MoveitCollisionChecker(const planning_scene::PlanningScenePtr& planning_scene,
                          const std::string& group_name,
                          const cnr_logger::TraceLoggerPtr& logger,
                          const double& min_distance = 0.01):
     CollisionCheckerBase(logger,min_distance),
-    group_name_(group_name),
     planning_scene_(planning_scene),
+    group_name_(group_name),
     logger_(logger)
   {
     state_ = std::make_shared<robot_state::RobotState>(planning_scene_->getCurrentState());
@@ -72,19 +121,35 @@ public:
       CNR_ERROR(logger_,"Invalid planning scene");
   }
 
+  /**
+   * @brief Set the MoveIt! PlanningScene based on a PlanningScene message.
+   *
+   * @param msg The PlanningScene message.
+   */
   virtual void setPlanningSceneMsg(const moveit_msgs::PlanningScene& msg)
   {
     if (!planning_scene_->usePlanningSceneMsg(msg))
       CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
   }
 
-  virtual CollisionCheckerPtr clone()
+  /**
+   * @brief Clone the CollisionChecker.
+   *
+   * @return A new indipendent CollisionCheckerPtr with the same configuration.
+   */
+  virtual CollisionCheckerPtr clone() override
   {
     planning_scene::PlanningScenePtr planning_scene = planning_scene::PlanningScene::clone(planning_scene_);
     return std::make_shared<MoveitCollisionChecker>(planning_scene,group_name_,logger_,min_distance_);
   }
 
-  virtual bool check(const Eigen::VectorXd& configuration)
+  /**
+   * @brief Perform collision checking for a given joint configuration.
+   *
+   * @param configuration The joint configuration to check for collisions.
+   * @return True if collision-free, false if collision occurs.
+   */
+  virtual bool check(const Eigen::VectorXd& configuration) override
   {
     *state_ = planning_scene_->getCurrentState();
 
@@ -102,20 +167,35 @@ public:
     return !planning_scene_->isStateColliding(*state_,group_name_);
   }
 
+  /**
+   * @brief Set the MoveIt! PlanningScene.
+   *
+   * @param planning_scene Pointer to the new MoveIt! PlanningScene.
+   */
   virtual void setPlanningScene(planning_scene::PlanningScenePtr &planning_scene)
   {
     planning_scene_ = planning_scene;
   }
 
+  /**
+   * @brief Get the name of the joint group.
+   *
+   * @return The name of the joint group.
+   */
   std::string getGroupName() override
   {
     return group_name_;
   }
 
+  /**
+   * @brief Get the MoveIt! PlanningScene instance used by the collision checker.
+   *
+   * @return Pointer to the MoveIt! PlanningScene.
+   */
   planning_scene::PlanningScenePtr getPlanningScene()
   {
     return planning_scene_;
   }
 
 };
-}
+} //namespace graph_core

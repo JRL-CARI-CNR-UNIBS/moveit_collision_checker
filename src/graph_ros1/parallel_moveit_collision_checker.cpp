@@ -58,11 +58,11 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
     queues_.push_back(std::vector<std::vector<double>>());
   }
 
-  req_.distance=false;
-  req_.group_name=group_name;
-  req_.verbose=false;
-  req_.contacts=false;
-  req_.cost=false;
+//  req_.distance=false;
+//  req_.group_name=group_name;
+//  req_.verbose=false;
+//  req_.contacts=false;
+//  req_.cost=false;
 }
 
 void ParallelMoveitCollisionChecker::resetQueue()
@@ -102,7 +102,7 @@ void ParallelMoveitCollisionChecker::queueUp(const Eigen::VectorXd &q)
 bool ParallelMoveitCollisionChecker::checkAllQueues()
 {
   assert(queues_.size() == threads_.size());
-  assert(threads_num_ == threads_.size());
+  assert(size_t(threads_num_) == threads_.size());
 
   stop_check_=false;
 
@@ -176,7 +176,7 @@ ParallelMoveitCollisionChecker::~ParallelMoveitCollisionChecker()
 bool ParallelMoveitCollisionChecker::asyncSetPlanningSceneMsg(const moveit_msgs::PlanningScene& msg, const int& idx)
 {
   bool res = true;
-  for(unsigned int i=idx;i<(idx+GROUP_SIZE);i++)
+  for(int i=idx;i<(idx+GROUP_SIZE);i++)
   {
     if(i == threads_num_)
       break;
@@ -193,7 +193,7 @@ bool ParallelMoveitCollisionChecker::asyncSetPlanningSceneMsg(const moveit_msgs:
 
 bool ParallelMoveitCollisionChecker::asyncSetPlanningScene(const planning_scene::PlanningScenePtr& scene, const int& idx)
 {
-  for(unsigned int i=idx;i<(idx+GROUP_SIZE);i++)
+  for(int i=idx;i<(idx+GROUP_SIZE);i++)
   {
     if(i == threads_num_)
       break;
@@ -298,7 +298,7 @@ void ParallelMoveitCollisionChecker::queueConnection(const Eigen::VectorXd& conf
   }
 }
 
-bool ParallelMoveitCollisionChecker::checkPath(const Eigen::VectorXd& configuration1,
+bool ParallelMoveitCollisionChecker::checkConnection(const Eigen::VectorXd& configuration1,
                                                const Eigen::VectorXd& configuration2)
 {
   resetQueue();

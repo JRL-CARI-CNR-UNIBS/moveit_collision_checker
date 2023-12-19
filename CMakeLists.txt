@@ -17,6 +17,15 @@ find_package(catkin REQUIRED COMPONENTS
 
 find_package(graph_core REQUIRED)
 
+#message("CNR LOGGER FOUND?")
+#message(${cnr_logger_FOUND})
+#message("BOOST FOUND?")
+#message(${Boost_FOUND})
+#message("YAML CPP FOUND?")
+#message(${YAML_CPP_LIBRARIES})
+#message("Ygraph core FOUND?")
+#message(${graph_core_FOUND})
+
 ###################################
 ## catkin specific configuration ##
 ###################################
@@ -30,8 +39,8 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES graph_ros1
   CATKIN_DEPENDS actionlib moveit_core moveit_ros_planning moveit_ros_planning_interface moveit_visual_tools roscpp rviz_visual_tools
-  DEPENDS system_lib graph_core
-)
+  DEPENDS graph_core
+  )
 
 ###########
 ## Build ##
@@ -41,13 +50,15 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
+  ${graph_core_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
 # Declare a C++ library
  add_library(${PROJECT_NAME}
-   src/${PROJECT_NAME}/moveit_collision_checker.cpp
    src/${PROJECT_NAME}/parallel_moveit_collision_checker.cpp
  )
-
+target_link_libraries(${PROJECT_NAME}
+  ${graph_core_LIBRARIES}
+)
 

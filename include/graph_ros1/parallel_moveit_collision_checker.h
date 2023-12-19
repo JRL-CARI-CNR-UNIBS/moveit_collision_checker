@@ -35,59 +35,162 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace graph_core
 {
 
+/**
+ * @class ParallelMoveitCollisionChecker
+ * @brief Implementation of a parallel collision checker using MoveIt! library for multi-threaded collision checking.
+ *
+ * This class extends the MoveitCollisionChecker and adds parallel collision checking functionality
+ * by distributing collision checks across multiple threads.
+ */
 class ParallelMoveitCollisionChecker: public MoveitCollisionChecker
 {
 #define GROUP_SIZE 10
 
 protected:
+
+  /**
+   * @brief threads_num_   Number of parallel threads for collision checking.
+   */
   int threads_num_;
+
+  /**
+   * @brief thread_iter_ Iterator for distributing collision checks among threads.
+   */
   int thread_iter_=0;
+
+  /**
+   * @brief stop_check_ Flag to stop ongoing collision checks.
+   */
   bool stop_check_;
+
+  /**
+   * @brief at_least_a_collision_ Flag indicating if at least one collision is detected.
+   */
   bool at_least_a_collision_;
 
-  std::string group_name_;
-  double min_distance_;
-
+  /**
+   * @brief queues_ Queues for storing joint configurations to be checked.
+   */
   std::vector<std::vector<std::vector<double>>> queues_;
-  std::vector<std::thread> threads_;
-  std::vector<planning_scene::PlanningScenePtr> planning_scenes_;
-  collision_detection::CollisionRequest req_;
-  collision_detection::CollisionResult res_;
 
+  /**
+   * @brief threads_ Vector of threads for parallel collision checking.
+   */
+  std::vector<std::thread> threads_;
+
+  /**
+   * @brief planning_scenes_ Vector of PlanningScene objects for each thread.
+   */
+  std::vector<planning_scene::PlanningScenePtr> planning_scenes_;
+//  collision_detection::CollisionRequest req_;
+//  collision_detection::CollisionResult res_;
+
+  /**
+   * @brief Reset the queue storing the configurations to check for each thread.
+   */
   void resetQueue();
+
+  /**
+   * @brief Add a joint configuration to the queues for collision checking.
+   *
+   * @param q Joint configuration to be added to the queue.
+   */
   void queueUp(const Eigen::VectorXd &q);
+
+  /**
+   * @brief Check collisions for all joint configurations in the queues.
+   *
+   * @return True if all configurations are collision-free, false if at least one collision is detected.
+   */
   bool checkAllQueues();
+
+  /**
+   * @brief Collision checking thread function for each parallel thread.
+   *
+   * @param thread_idx Index of the thread.
+   */
   void collisionThread(int thread_idx);
+
+  /**
+   * @brief Asynchronously set the PlanningScene based on a PlanningScene message for a group of threads.
+   *
+   * @param msg The PlanningScene message.
+   * @param idx Index of the first thread to update.
+   * @return True if successful, false otherwise.
+   */
   bool asyncSetPlanningSceneMsg(const moveit_msgs::PlanningScene& msg, const int &idx);
+
+  /**
+   * @brief Asynchronously clone and set the PlanningScene for a group of threads.
+   *
+   * @param scene Pointer to the new PlanningScene.
+   * @param idx Index of the first thread to update.
+   * @return True if successful, false otherwise.
+   */
   bool asyncSetPlanningScene(const planning_scene::PlanningScenePtr& scene, const int& idx);
 
-
+  /**
+   * @brief Add to the queues the joint configurations along the connection between two given configurations.
+   *
+   * @param configuration1 Starting joint configuration.
+   * @param configuration2 Ending joint configuration.
+   */
   void queueConnection(const Eigen::VectorXd& configuration1,
                        const Eigen::VectorXd& configuration2);
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  /**
+   * @brief Constructor for ParallelMoveitCollisionChecker class.
+   *
+   * @param planning_scene Pointer to the MoveIt! PlanningScene.
+   * @param group_name Name of the joint group for collision checking.
+   * @param logger Pointer to the logger for logging messages.
+   * @param threads_num Number of parallel threads for collision checking (default is 4).
+   * @param min_distance Minimum distance for collision checking (default is 0.01).
+   */
   ParallelMoveitCollisionChecker(const planning_scene::PlanningScenePtr& planning_scene,
                                  const std::string& group_name,
                                  const cnr_logger::TraceLoggerPtr& logger,
                                  const int& threads_num=4,
                                  const double& min_distance = 0.01);
 
+  /**
+   * @brief Destructor for ParallelMoveitCollisionChecker class.
+   */
   ~ParallelMoveitCollisionChecker();
 
-  virtual void setPlanningSceneMsg(const moveit_msgs::PlanningScene& msg);
+  /**
+   * @brief Set the PlanningScene based on a PlanningScene message for the entire group of threads.
+   *
+   * @param msg The PlanningScene message.
+   */
+  virtual void setPlanningSceneMsg(const moveit_msgs::PlanningScene& msg) override;
 
-  virtual void setPlanningScene(planning_scene::PlanningScenePtr &planning_scene);
+  /**
+   * @brief Set the PlanningScene for the entire group of threads.
+   *
+   * @param planning_scene Pointer to the new PlanningScene.
+   */
+  virtual void setPlanningScene(planning_scene::PlanningScenePtr &planning_scene) override;
 
-  virtual bool checkPath(const Eigen::VectorXd& configuration1,
-                         const Eigen::VectorXd& configuration2);
+  /**
+   * @brief Check collisions along a path between two joint configurations.
+   *
+   * @param configuration1 Starting joint configuration.
+   * @param configuration2 Ending joint configuration.
+   * @return True if the path is collision-free, false if collisions are detected.
+   */
+  virtual bool checkConnection(const Eigen::VectorXd& configuration1,
+                         const Eigen::VectorXd& configuration2) override;
 
   virtual bool checkConnFromConf(const ConnectionPtr& conn,
-                                 const Eigen::VectorXd& this_conf);
+                                 const Eigen::VectorXd& this_conf) override;
 
-  virtual bool checkConnections(const std::vector<ConnectionPtr>& connections);
+  virtual bool checkConnections(const std::vector<ConnectionPtr>& connections) override;
 
-  virtual CollisionCheckerPtr clone();
+  virtual CollisionCheckerPtr clone() override;
 
 };
-}  // namaspace pathplan
+}  // namaspace graph_core
