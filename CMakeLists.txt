@@ -61,4 +61,3 @@ include_directories(
 target_link_libraries(${PROJECT_NAME}
   ${graph_core_LIBRARIES}
 )
-
