@@ -131,11 +131,9 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
       break;
 
     assert(configuration.size()>0);
-    //state->setJointGroupPositions(group_name_, configuration);
 
     for (size_t ij=0;ij<joint_names_.size();ij++)
     {
-      // state_->setJointPositions(joint_models_.at(ij),&configuration.at(ij));
       state->setJointPositions(joint_models_.at(ij),&configuration.at(ij));
 
     }
