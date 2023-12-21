@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <future>
 #include <mutex>
 
-namespace graph_core
+namespace graph_ros1
 {
+
+using namespace graph_core;
 
 /**
  * @class ParallelMoveitCollisionChecker
