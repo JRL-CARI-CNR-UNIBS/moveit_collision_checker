@@ -27,7 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <graph_ros1/parallel_moveit_collision_checker.h>
 
-namespace graph_ros1
+namespace graph
+{
+namespace ros1
 {
 
 ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_scene::PlanningScenePtr &planning_scene,
@@ -375,4 +377,5 @@ CollisionCheckerPtr ParallelMoveitCollisionChecker::clone()
   return std::make_shared<ParallelMoveitCollisionChecker>(planning_scene,group_name_,logger_,threads_num_,min_distance_);
 }
 
-}  // graph_core
+} //namespace ros1
+} //namespace graph

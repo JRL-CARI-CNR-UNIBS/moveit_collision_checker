@@ -32,10 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <future>
 #include <mutex>
 
-namespace graph_ros1
+namespace graph
+{
+namespace ros1
 {
 
-using namespace graph_core;
+using namespace graph::core;
 
 /**
  * @class ParallelMoveitCollisionChecker
@@ -195,4 +197,6 @@ public:
   virtual CollisionCheckerPtr clone() override;
 
 };
-}  // namaspace graph_core
+
+} //namespace ros1
+} //namespace graph

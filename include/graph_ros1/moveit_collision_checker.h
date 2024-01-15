@@ -31,10 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <moveit/planning_scene/planning_scene.h>
 #include <graph_core/collision_checker_base.h>
 
-namespace graph_ros1
+namespace graph
 {
+using namespace graph::core;
 
-using namespace graph_core;
+namespace ros1
+{
 
 /**
  * @class MoveitCollisionChecker
@@ -200,4 +202,6 @@ public:
   }
 
 };
-} //namespace graph_core
+
+} //namespace ros1
+} //namespace graph
