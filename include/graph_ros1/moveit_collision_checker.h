@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ros/ros.h>
 #include <moveit_msgs/PlanningScene.h>
 #include <moveit/planning_scene/planning_scene.h>
-#include <graph_core/collision_checker_base.h>
+#include <graph_core/collision_checkers/collision_checker_base.h>
 
 namespace graph
 {
