@@ -34,7 +34,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace graph
 {
-using namespace graph::core;
 
 namespace ros1
 {
@@ -86,8 +85,6 @@ protected:
    * @brief planning_scenes_ Vector of PlanningScene objects for each thread.
    */
   std::vector<planning_scene::PlanningScenePtr> planning_scenes_;
-//  collision_detection::CollisionRequest req_;
-//  collision_detection::CollisionResult res_;
 
   /**
    * @brief Reset the queue storing the configurations to check for each thread.
@@ -146,6 +143,11 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   /**
+   * @brief Empty constructor for ParallelMoveitCollisionChecker. The function init() must be called afterwards.
+   */
+  ParallelMoveitCollisionChecker():MoveitCollisionChecker(){}
+
+  /**
    * @brief Constructor for ParallelMoveitCollisionChecker class.
    *
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
@@ -164,6 +166,21 @@ public:
    * @brief Destructor for ParallelMoveitCollisionChecker class.
    */
   ~ParallelMoveitCollisionChecker();
+
+  /**
+   * @brief init Initialise the object, defining its main attributes. At the end of the function, the flag 'init_' is set to true and the object can execute its main functions.
+   *
+   * @param planning_scene Pointer to the MoveIt! PlanningScene.
+   * @param group_name Name of the joint group for collision checking.
+   * @param logger Pointer to the logger for logging messages.
+   * @param threads_num Number of parallel threads for collision checking (default is 4).
+   * @param min_distance Minimum distance for collision checking (default is 0.01).
+   */
+  virtual bool init(const planning_scene::PlanningScenePtr& planning_scene,
+                    const std::string& group_name,
+                    const cnr_logger::TraceLoggerPtr& logger,
+                    const int& threads_num=4,
+                    const double& min_distance = 0.0);
 
   /**
    * @brief Set the PlanningScene based on a PlanningScene message for the entire group of threads.
@@ -189,12 +206,12 @@ public:
   virtual bool checkConnection(const Eigen::VectorXd& configuration1,
                          const Eigen::VectorXd& configuration2) override;
 
-  virtual bool checkConnFromConf(const ConnectionPtr& conn,
+  virtual bool checkConnFromConf(const graph::core::ConnectionPtr& conn,
                                  const Eigen::VectorXd& this_conf) override;
 
-  virtual bool checkConnections(const std::vector<ConnectionPtr>& connections) override;
+  virtual bool checkConnections(const std::vector<graph::core::ConnectionPtr>& connections) override;
 
-  virtual CollisionCheckerPtr clone() override;
+  virtual graph::core::CollisionCheckerPtr clone() override;
 
 };
 

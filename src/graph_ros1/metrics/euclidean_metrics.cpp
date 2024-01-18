@@ -25,20 +25,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include <graph_ros1/metrics/euclidean_metrics.h>
 #include <pluginlib/class_list_macros.h>
-
-#include <graph_ros1/collision_checkers/parallel_moveit_collision_checker.h>
-#include <graph_core/samplers/tube_informed_sampler.h>
-#include <graph_core/metrics/euclidean_metrics.h>
-#include <graph_core/solvers/rrt.h>
 
 namespace graph
 {
 namespace ros1
 {
 
-
-//PLUGINLIB_EXPORT_CLASS(graph::core::RRT, graph::core::TreeSolver)
+PLUGINLIB_EXPORT_CLASS(EuclideanMetrics,MetricsBase)
 
 } //namespace ros1
 } //namespace graph

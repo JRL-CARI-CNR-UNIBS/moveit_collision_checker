@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <graph_ros1/collision_checkers/parallel_moveit_collision_checker.h>
+#include <pluginlib/class_list_macros.h>
 
 namespace graph
 {
@@ -40,12 +41,9 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
   MoveitCollisionChecker(planning_scene,group_name,logger,min_distance),
   threads_num_(threads_num)
 {
-  min_distance_ = min_distance;
-  group_name_ = group_name;
-
   if (threads_num<=0)
   {
-    CNR_FATAL(graph::core::global_logger_,"number of thread should be positive");
+    CNR_FATAL(logger_,"number of thread should be positive");
     throw std::invalid_argument("number of thread should be positive");
   }
 
@@ -60,11 +58,42 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
     queues_.push_back(std::vector<std::vector<double>>());
   }
 
-//  req_.distance=false;
-//  req_.group_name=group_name;
-//  req_.verbose=false;
-//  req_.contacts=false;
-//  req_.cost=false;
+  //  req_.distance=false;
+  //  req_.group_name=group_name;
+  //  req_.verbose=false;
+  //  req_.contacts=false;
+  //  req_.cost=false;
+}
+
+bool ParallelMoveitCollisionChecker::init(const planning_scene::PlanningScenePtr& planning_scene,
+                                          const std::string& group_name,
+                                          const cnr_logger::TraceLoggerPtr& logger,
+                                          const int& threads_num,
+                                          const double& min_distance)
+{
+  if(not MoveitCollisionChecker::init(planning_scene,group_name,logger,min_distance))
+    return false;
+
+  if (threads_num<=0)
+  {
+    CNR_FATAL(logger_,"number of thread should be positive");
+    throw std::invalid_argument("number of thread should be positive");
+  }
+  else
+    threads_num_ = threads_num;
+
+  at_least_a_collision_=false;
+  stop_check_=true;
+  thread_iter_=0;
+
+  threads_.resize(threads_num_);
+  for (int idx=0;idx<threads_num_;idx++)
+  {
+    planning_scenes_.push_back(planning_scene::PlanningScene::clone(planning_scene_));
+    queues_.push_back(std::vector<std::vector<double>>());
+  }
+
+  return true;
 }
 
 void ParallelMoveitCollisionChecker::resetQueue()
@@ -96,7 +125,7 @@ void ParallelMoveitCollisionChecker::queueUp(const Eigen::VectorXd &q)
   }
   else
   {
-    CNR_FATAL(graph::core::global_logger_,"q is empty");
+    CNR_FATAL(logger_,"q is empty");
     throw std::invalid_argument("q is empty");
   }
 }
@@ -162,7 +191,7 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
 
 ParallelMoveitCollisionChecker::~ParallelMoveitCollisionChecker()
 {
-  CNR_DEBUG(graph::core::global_logger_,"Closing collision threads");
+  CNR_DEBUG(logger_,"Closing collision threads");
   stop_check_=true;
 
   for (int idx=0;idx<threads_num_;idx++)
@@ -170,7 +199,7 @@ ParallelMoveitCollisionChecker::~ParallelMoveitCollisionChecker()
     if (threads_.at(idx).joinable())
       threads_.at(idx).join();
   }
-  CNR_DEBUG(graph::core::global_logger_,"Collision threads closed");
+  CNR_DEBUG(logger_,"Collision threads closed");
 }
 
 bool ParallelMoveitCollisionChecker::asyncSetPlanningSceneMsg(const moveit_msgs::PlanningScene& msg, const int& idx)
@@ -183,7 +212,7 @@ bool ParallelMoveitCollisionChecker::asyncSetPlanningSceneMsg(const moveit_msgs:
 
     if(not planning_scenes_[i]->usePlanningSceneMsg(msg))
     {
-      CNR_ERROR_THROTTLE(graph::core::global_logger_,1,"Unable to upload scene");
+      CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
       res = false;
     }
   }
@@ -215,7 +244,7 @@ void ParallelMoveitCollisionChecker::setPlanningSceneMsg(const moveit_msgs::Plan
   }
 
   if (!planning_scene_->usePlanningSceneMsg(msg))
-    CNR_ERROR_THROTTLE(graph::core::global_logger_,1,"Unable to upload scene");
+    CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
 
 
   int n_groups = std::floor(threads_num_/GROUP_SIZE);
@@ -273,7 +302,7 @@ void ParallelMoveitCollisionChecker::setPlanningScene(planning_scene::PlanningSc
   for (int idx=0;idx<n_groups;idx++)
   {
     if(!futures.at(idx).get())
-      CNR_ERROR_THROTTLE(graph::core::global_logger_,1,"Unable to upload scene");
+      CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
   }
 }
 
@@ -299,9 +328,8 @@ void ParallelMoveitCollisionChecker::queueConnection(const Eigen::VectorXd& conf
 }
 
 bool ParallelMoveitCollisionChecker::checkConnection(const Eigen::VectorXd& configuration1,
-                                               const Eigen::VectorXd& configuration2)
+                                                     const Eigen::VectorXd& configuration2)
 {
-  CNR_DEBUG(graph::core::global_logger_,"PROVAAAAAAAAAAA");
   resetQueue();
   if (!check(configuration1))
     return false;
@@ -311,7 +339,7 @@ bool ParallelMoveitCollisionChecker::checkConnection(const Eigen::VectorXd& conf
   return checkAllQueues();
 }
 
-bool ParallelMoveitCollisionChecker::checkConnFromConf(const ConnectionPtr& conn,
+bool ParallelMoveitCollisionChecker::checkConnFromConf(const graph::core::ConnectionPtr& conn,
                                                        const Eigen::VectorXd& this_conf)
 {
   resetQueue();
@@ -324,7 +352,7 @@ bool ParallelMoveitCollisionChecker::checkConnFromConf(const ConnectionPtr& conn
 
   if((dist-dist_child-dist_parent)>1e-04)
   {
-    CNR_FATAL(graph::core::global_logger_,"The conf is not on the connection between parent and child");
+    CNR_FATAL(logger_,"The conf is not on the connection between parent and child");
     throw std::invalid_argument("The conf is not on the connection between parent and child");
   }
 
@@ -358,12 +386,12 @@ bool ParallelMoveitCollisionChecker::checkConnFromConf(const ConnectionPtr& conn
   return checkAllQueues();
 }
 
-bool ParallelMoveitCollisionChecker::checkConnections(const std::vector<ConnectionPtr>& connections)
+bool ParallelMoveitCollisionChecker::checkConnections(const std::vector<graph::core::ConnectionPtr>& connections)
 {
   resetQueue();
   if (!check(connections.front()->getParent()->getConfiguration()))
     return false;
-  for (const ConnectionPtr& c: connections)
+  for (const graph::core::ConnectionPtr& c: connections)
   {
     if (!check(c->getChild()->getConfiguration()))
       return false;
@@ -372,11 +400,13 @@ bool ParallelMoveitCollisionChecker::checkConnections(const std::vector<Connecti
   return checkAllQueues();
 }
 
-CollisionCheckerPtr ParallelMoveitCollisionChecker::clone()
+graph::core::CollisionCheckerPtr ParallelMoveitCollisionChecker::clone()
 {
   planning_scene::PlanningScenePtr planning_scene = planning_scene::PlanningScene::clone(planning_scene_);
   return std::make_shared<ParallelMoveitCollisionChecker>(planning_scene,group_name_,logger_,threads_num_,min_distance_);
 }
 
+
+PLUGINLIB_EXPORT_CLASS(ParallelMoveitCollisionChecker,CollisionCheckerBase)
 } //namespace ros1
 } //namespace graph

@@ -1,5 +1,12 @@
-<library path="lib/liblinear_controller">
-  <class type="graph::core::RRT" base_class_type="graph::core::TreeSolver">
-    <description>graph::core::RRT plugin</description>
+<library path="lib/libgraph_ros1">
+  <class type="graph::ros1::MoveitCollisionChecker" base_class_type="graph::ros1::CollisionCheckerBase">
+    <description>graph::ros1::MoveitCollisionChecker plugin</description>
   </class>
+  <class type="graph::ros1::ParallelMoveitCollisionChecker" base_class_type="graph::ros1::MoveitCollisionChecker">
+    <description>graph::ros1::ParallelMoveitCollisionChecker plugin</description>
+  </class>
+
+<class type="graph::ros1::EuclideanMetrics" base_class_type="graph::ros1::MetricsBase">
+  <description>graph::ros1::EuclideanMetrics plugin</description>
+</class>
 </library>

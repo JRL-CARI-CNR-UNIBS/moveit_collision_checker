@@ -29,11 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ros/ros.h>
 #include <moveit_msgs/PlanningScene.h>
 #include <moveit/planning_scene/planning_scene.h>
-#include <graph_core/collision_checkers/collision_checker_base.h>
+#include <graph_ros1/collision_checkers/collision_checker_base.h>
 
 namespace graph
 {
-using namespace graph::core;
 
 namespace ros1
 {
@@ -46,7 +45,7 @@ namespace ros1
  * using the MoveIt! library. It interacts with a MoveIt! PlanningScene to perform collision checks
  * for a specified joint group.
  */
-class MoveitCollisionChecker: public CollisionCheckerBase
+class MoveitCollisionChecker: public CollisionCheckerBase //graph::ros1::CollisionCheckerBase
 {
 protected:
   /**
@@ -92,10 +91,15 @@ protected:
    * to perform logging operations. TraceLogger is a part of the cnr_logger library.
    * Ensure that the logger is properly configured and available for use.
    */
-  const cnr_logger::TraceLoggerPtr& logger_;
+  cnr_logger::TraceLoggerPtr logger_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  /**
+   * @brief Empty constructor for MoveitCollisionChecker. The function init() must be called afterwards.
+   */
+  MoveitCollisionChecker():CollisionCheckerBase(){} //set init_ false
 
   /**
    * @brief Constructor for MoveitCollisionChecker class.
@@ -109,7 +113,7 @@ public:
                          const std::string& group_name,
                          const cnr_logger::TraceLoggerPtr& logger,
                          const double& min_distance = 0.01):
-    CollisionCheckerBase(logger,min_distance),
+    CollisionCheckerBase(logger,min_distance), //set init_ true
     planning_scene_(planning_scene),
     group_name_(group_name),
     logger_(logger)
@@ -120,9 +124,38 @@ public:
     joint_models_=jmg_->getActiveJointModels();
     mimic_joint_models_=jmg_->getMimicJointModels();
 
+    if (!planning_scene_)
+      CNR_ERROR(logger_,"Invalid planning scene");
+  }
+
+  /**
+   * @brief init Initialise the object, defining its main attributes. At the end of the function, the flag 'init_' is set to true and the object can execute its main functions.
+   * @param planning_scene Pointer to the MoveIt! PlanningScene.
+   * @param group_name Name of the joint group for collision checking.
+   * @param logger Pointer to the logger for logging messages.
+   * @param min_distance Minimum distance for collision checking (default is 0.01).
+   */
+  virtual bool init(const planning_scene::PlanningScenePtr& planning_scene,
+                    const std::string& group_name,
+                    const cnr_logger::TraceLoggerPtr& logger,
+                    const double& min_distance = 0.01)
+  {
+    if(not CollisionCheckerBase::init(logger,min_distance))
+      return false;
+
+    planning_scene_ = planning_scene;
+    group_name_ = group_name;
+
+    state_ = std::make_shared<robot_state::RobotState>(planning_scene_->getCurrentState());
+    jmg_ = state_->getJointModelGroup(group_name_);
+    joint_names_=jmg_->getActiveJointModelNames();
+    joint_models_=jmg_->getActiveJointModels();
+    mimic_joint_models_=jmg_->getMimicJointModels();
 
     if (!planning_scene_)
       CNR_ERROR(logger_,"Invalid planning scene");
+
+    return true;
   }
 
   /**
@@ -141,7 +174,7 @@ public:
    *
    * @return A new indipendent CollisionCheckerPtr with the same configuration.
    */
-  virtual CollisionCheckerPtr clone() override
+  virtual graph::core::CollisionCheckerPtr clone() override
   {
     planning_scene::PlanningScenePtr planning_scene = planning_scene::PlanningScene::clone(planning_scene_);
     return std::make_shared<MoveitCollisionChecker>(planning_scene,group_name_,logger_,min_distance_);
