@@ -1,0 +1,5 @@
+<library path="lib/liblinear_controller">
+  <class type="graph::core::RRT" base_class_type="graph::core::TreeSolver">
+    <description>graph::core::RRT plugin</description>
+  </class>
+</library>

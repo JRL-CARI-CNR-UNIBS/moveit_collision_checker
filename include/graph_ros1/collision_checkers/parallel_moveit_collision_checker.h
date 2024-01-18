@@ -27,17 +27,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#include <graph_ros1/moveit_collision_checker.h>
+#include <graph_ros1/collision_checkers/moveit_collision_checker.h>
 #include <thread>
 #include <future>
 #include <mutex>
 
 namespace graph
 {
+using namespace graph::core;
+
 namespace ros1
 {
-
-using namespace graph::core;
 
 /**
  * @class ParallelMoveitCollisionChecker

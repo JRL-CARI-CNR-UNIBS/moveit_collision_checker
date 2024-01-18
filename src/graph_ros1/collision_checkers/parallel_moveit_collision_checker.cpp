@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <graph_ros1/parallel_moveit_collision_checker.h>
+#include <graph_ros1/collision_checkers/parallel_moveit_collision_checker.h>
 
 namespace graph
 {
@@ -45,7 +45,7 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
 
   if (threads_num<=0)
   {
-    CNR_FATAL(logger_,"number of thread should be positive");
+    CNR_FATAL(graph::core::global_logger_,"number of thread should be positive");
     throw std::invalid_argument("number of thread should be positive");
   }
 
@@ -96,7 +96,7 @@ void ParallelMoveitCollisionChecker::queueUp(const Eigen::VectorXd &q)
   }
   else
   {
-    CNR_FATAL(logger_,"q is empty");
+    CNR_FATAL(graph::core::global_logger_,"q is empty");
     throw std::invalid_argument("q is empty");
   }
 }
@@ -162,7 +162,7 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
 
 ParallelMoveitCollisionChecker::~ParallelMoveitCollisionChecker()
 {
-  CNR_DEBUG(logger_,"Closing collision threads");
+  CNR_DEBUG(graph::core::global_logger_,"Closing collision threads");
   stop_check_=true;
 
   for (int idx=0;idx<threads_num_;idx++)
@@ -170,7 +170,7 @@ ParallelMoveitCollisionChecker::~ParallelMoveitCollisionChecker()
     if (threads_.at(idx).joinable())
       threads_.at(idx).join();
   }
-  CNR_DEBUG(logger_,"Collision threads closed");
+  CNR_DEBUG(graph::core::global_logger_,"Collision threads closed");
 }
 
 bool ParallelMoveitCollisionChecker::asyncSetPlanningSceneMsg(const moveit_msgs::PlanningScene& msg, const int& idx)
@@ -183,7 +183,7 @@ bool ParallelMoveitCollisionChecker::asyncSetPlanningSceneMsg(const moveit_msgs:
 
     if(not planning_scenes_[i]->usePlanningSceneMsg(msg))
     {
-      CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
+      CNR_ERROR_THROTTLE(graph::core::global_logger_,1,"Unable to upload scene");
       res = false;
     }
   }
@@ -215,7 +215,7 @@ void ParallelMoveitCollisionChecker::setPlanningSceneMsg(const moveit_msgs::Plan
   }
 
   if (!planning_scene_->usePlanningSceneMsg(msg))
-    CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
+    CNR_ERROR_THROTTLE(graph::core::global_logger_,1,"Unable to upload scene");
 
 
   int n_groups = std::floor(threads_num_/GROUP_SIZE);
@@ -273,7 +273,7 @@ void ParallelMoveitCollisionChecker::setPlanningScene(planning_scene::PlanningSc
   for (int idx=0;idx<n_groups;idx++)
   {
     if(!futures.at(idx).get())
-      CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
+      CNR_ERROR_THROTTLE(graph::core::global_logger_,1,"Unable to upload scene");
   }
 }
 
@@ -301,6 +301,7 @@ void ParallelMoveitCollisionChecker::queueConnection(const Eigen::VectorXd& conf
 bool ParallelMoveitCollisionChecker::checkConnection(const Eigen::VectorXd& configuration1,
                                                const Eigen::VectorXd& configuration2)
 {
+  CNR_DEBUG(graph::core::global_logger_,"PROVAAAAAAAAAAA");
   resetQueue();
   if (!check(configuration1))
     return false;
@@ -323,7 +324,7 @@ bool ParallelMoveitCollisionChecker::checkConnFromConf(const ConnectionPtr& conn
 
   if((dist-dist_child-dist_parent)>1e-04)
   {
-    CNR_FATAL(logger_,"The conf is not on the connection between parent and child");
+    CNR_FATAL(graph::core::global_logger_,"The conf is not on the connection between parent and child");
     throw std::invalid_argument("The conf is not on the connection between parent and child");
   }
 
