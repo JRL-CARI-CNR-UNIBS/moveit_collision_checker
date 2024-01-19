@@ -35,6 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace graph
 {
 
+using namespace graph::core;
+
 namespace ros1
 {
 
@@ -206,12 +208,12 @@ public:
   virtual bool checkConnection(const Eigen::VectorXd& configuration1,
                          const Eigen::VectorXd& configuration2) override;
 
-  virtual bool checkConnFromConf(const graph::core::ConnectionPtr& conn,
+  virtual bool checkConnFromConf(const ConnectionPtr& conn,
                                  const Eigen::VectorXd& this_conf) override;
 
-  virtual bool checkConnections(const std::vector<graph::core::ConnectionPtr>& connections) override;
+  virtual bool checkConnections(const std::vector<ConnectionPtr>& connections) override;
 
-  virtual graph::core::CollisionCheckerPtr clone() override;
+  virtual CollisionCheckerPtr clone() override;
 
 };
 

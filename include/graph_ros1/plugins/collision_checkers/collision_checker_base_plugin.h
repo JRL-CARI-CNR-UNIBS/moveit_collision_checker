@@ -27,7 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <ros/ros.h>
-#include <graph_core/metrics/metrics_base.h>
+#include <moveit_msgs/PlanningScene.h>
+#include <moveit/planning_scene/planning_scene.h>
+#include <graph_core/collision_checkers/collision_checker_base.h>
 
 namespace graph
 {
@@ -35,30 +37,52 @@ namespace ros1
 {
 
 /**
- * @class MetricsBase
- * @brief This class simply derive from graph::core::MetricsBase to allow the implementation of plugins with MetricsBase as base class.
+ * @class CollisionCheckerBasePlugin
+ * @brief This class implements a wrapper to graph::core::CollisionCheckerBase to allow its plugin to be defined.
+ * The class can be loaded as a plugin and builds a graph::core::CollisionCheckerBase object.
  */
-class MetricsBase;
-typedef std::shared_ptr<MetricsBase> MetricsPtr;
+class CollisionCheckerBasePlugin;
+typedef std::shared_ptr<CollisionCheckerBasePlugin> CollisionCheckerPluginPtr;
 
-class MetricsBase: public graph::core::MetricsBase
+class CollisionCheckerBasePlugin: std::enable_shared_from_this<CollisionCheckerBasePlugin>
 {
 protected:
+
+  /**
+   * @brief collision_checker_ is the graph::core::CollisionCheckerBase object built and initialized by this plugin class.
+   */
+  graph::core::CollisionCheckerPtr collision_checker_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   /**
-   * @brief Empty constructor for MetricsBase. The function init() must be called afterwards.
+   * @brief Empty constructor for CollisionCheckerBase. The function init() must be called afterwards.
    */
-  MetricsBase(): graph::core::MetricsBase(){}
+  CollisionCheckerBasePlugin()
+  {
+    collision_checker_ = nullptr;
+  }
 
   /**
-   * @brief Constructor for MetricsBase.
-   * @param logger Pointer to a TraceLogger for logging.
+   * @brief getCollisionChecker return the graph::core::CollisionCheckerPtr object built by the plugin.
+   * @return the graph::core::CollisionCheckerPtr object built.
    */
-  MetricsBase(const cnr_logger::TraceLoggerPtr& logger):
-    graph::core::MetricsBase(logger){}
+  graph::core::CollisionCheckerPtr getCollisionChecker()
+  {
+    return collision_checker_;
+  }
+
+  /**
+   * @brief init Initialise the graph::core::CollisionCheckerBase object, defining its main attributes.
+   * @param nh Ros node handle to read params from the ros parameters server.
+   * @param planning_scene Pointer to the MoveIt! PlanningScene.
+   * @param logger Pointer to a TraceLogger for logging.
+   * @return True if correctly initialised, False if already initialised.
+   */
+  virtual bool init(const ros::NodeHandle& nh,
+                    const planning_scene::PlanningScenePtr& planning_scene,
+                    const cnr_logger::TraceLoggerPtr& logger) = 0;
 
 };
 

@@ -26,7 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include <graph_ros1/collision_checkers/parallel_moveit_collision_checker.h>
-#include <pluginlib/class_list_macros.h>
 
 namespace graph
 {
@@ -339,7 +338,7 @@ bool ParallelMoveitCollisionChecker::checkConnection(const Eigen::VectorXd& conf
   return checkAllQueues();
 }
 
-bool ParallelMoveitCollisionChecker::checkConnFromConf(const graph::core::ConnectionPtr& conn,
+bool ParallelMoveitCollisionChecker::checkConnFromConf(const ConnectionPtr& conn,
                                                        const Eigen::VectorXd& this_conf)
 {
   resetQueue();
@@ -386,12 +385,12 @@ bool ParallelMoveitCollisionChecker::checkConnFromConf(const graph::core::Connec
   return checkAllQueues();
 }
 
-bool ParallelMoveitCollisionChecker::checkConnections(const std::vector<graph::core::ConnectionPtr>& connections)
+bool ParallelMoveitCollisionChecker::checkConnections(const std::vector<ConnectionPtr>& connections)
 {
   resetQueue();
   if (!check(connections.front()->getParent()->getConfiguration()))
     return false;
-  for (const graph::core::ConnectionPtr& c: connections)
+  for (const ConnectionPtr& c: connections)
   {
     if (!check(c->getChild()->getConfiguration()))
       return false;
@@ -400,13 +399,10 @@ bool ParallelMoveitCollisionChecker::checkConnections(const std::vector<graph::c
   return checkAllQueues();
 }
 
-graph::core::CollisionCheckerPtr ParallelMoveitCollisionChecker::clone()
+CollisionCheckerPtr ParallelMoveitCollisionChecker::clone()
 {
   planning_scene::PlanningScenePtr planning_scene = planning_scene::PlanningScene::clone(planning_scene_);
   return std::make_shared<ParallelMoveitCollisionChecker>(planning_scene,group_name_,logger_,threads_num_,min_distance_);
 }
-
-
-PLUGINLIB_EXPORT_CLASS(ParallelMoveitCollisionChecker,CollisionCheckerBase)
 } //namespace ros1
 } //namespace graph

@@ -29,10 +29,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ros/ros.h>
 #include <moveit_msgs/PlanningScene.h>
 #include <moveit/planning_scene/planning_scene.h>
-#include <graph_ros1/collision_checkers/collision_checker_base.h>
+#include <graph_core/collision_checkers/collision_checker_base.h>
 
 namespace graph
 {
+
+using namespace graph::core;
 
 namespace ros1
 {
@@ -174,7 +176,7 @@ public:
    *
    * @return A new indipendent CollisionCheckerPtr with the same configuration.
    */
-  virtual graph::core::CollisionCheckerPtr clone() override
+  virtual CollisionCheckerPtr clone() override
   {
     planning_scene::PlanningScenePtr planning_scene = planning_scene::PlanningScene::clone(planning_scene_);
     return std::make_shared<MoveitCollisionChecker>(planning_scene,group_name_,logger_,min_distance_);

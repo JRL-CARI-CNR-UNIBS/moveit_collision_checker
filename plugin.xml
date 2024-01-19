@@ -1,12 +1,32 @@
 <library path="lib/libgraph_ros1">
-  <class type="graph::ros1::MoveitCollisionChecker" base_class_type="graph::ros1::CollisionCheckerBase">
+  <class type="graph::ros1::MoveitCollisionCheckerPlugin" base_class_type="graph::ros1::CollisionCheckerPluginBase">
     <description>graph::ros1::MoveitCollisionChecker plugin</description>
   </class>
-  <class type="graph::ros1::ParallelMoveitCollisionChecker" base_class_type="graph::ros1::MoveitCollisionChecker">
+  <class type="graph::ros1::ParallelMoveitCollisionCheckerPlugin" base_class_type="graph::ros1::CollisionCheckerPluginBase">
     <description>graph::ros1::ParallelMoveitCollisionChecker plugin</description>
   </class>
 
-<class type="graph::ros1::EuclideanMetrics" base_class_type="graph::ros1::MetricsBase">
-  <description>graph::ros1::EuclideanMetrics plugin</description>
-</class>
+  <class type="graph::ros1::EuclideanMetricsPlugin" base_class_type="graph::ros1::MetricsBasePlugin">
+    <description>graph::core::EuclideanMetrics plugin</description>
+  </class>
+
+  <class type="graph::ros1::InformedSamplerPlugin" base_class_type="graph::ros1::SamplerBasePlugin">
+    <description>graph::core::InformedSampler plugin</description>
+  </class>
+
+  <class type="graph::ros1::RRTPlugin" base_class_type="graph::ros1::TreeSolverPlugin">
+    <description>graph::core::RRT plugin</description>
+  </class>
+
+  <class type="graph::ros1::BiRRTPlugin" base_class_type="graph::ros1::TreeSolverPlugin">
+    <description>graph::core::BiRRT plugin</description>
+  </class>
+
+  <class type="graph::ros1::AnytimeRRTPlugin" base_class_type="graph::ros1::TreeSolverPlugin">
+    <description>graph::core::AnytimeRRT plugin</description>
+  </class>
+
+  <class type="graph::ros1::RRTStarPlugin" base_class_type="graph::ros1::TreeSolverPlugin">
+    <description>graph::core::RRTStar plugin</description>
+  </class>
 </library>

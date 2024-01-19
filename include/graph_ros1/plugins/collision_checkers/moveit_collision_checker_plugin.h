@@ -26,10 +26,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <ros/ros.h>
-#include <moveit_msgs/PlanningScene.h>
-#include <moveit/planning_scene/planning_scene.h>
-#include <graph_core/collision_checkers/collision_checker_base.h>
+#include <graph_ros1/plugins/collision_checkers/collision_checker_base_plugin.h>
+#include <graph_ros1/collision_checkers/moveit_collision_checker.h>
 
 namespace graph
 {
@@ -37,14 +35,10 @@ namespace ros1
 {
 
 /**
- * @class CollisionCheckerBase
- * @brief This class simply derive from graph::core::CollisionCheckerBase to allow the implementation of plugins with CollisionCheckerBase as base class.
- *
+ * @class MoveitCollisionCheckerPlugin
+ * @brief This class implements a wrapper to graph::ros1::MoveitCollisionChecker to allow its plugin to be defined.
  */
-class CollisionCheckerBase;
-typedef std::shared_ptr<CollisionCheckerBase> CollisionCheckerPtr;
-
-class CollisionCheckerBase: public graph::core::CollisionCheckerBase
+class MoveitCollisionCheckerPlugin: public CollisionCheckerBasePlugin
 {
 protected:
 
@@ -52,17 +46,35 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   /**
-   * @brief Empty constructor for CollisionCheckerBase. The function init() must be called afterwards.
+   * @brief Empty constructor for MoveitCollisionCheckerPlugin. The function MoveitCollisionCheckerPlugin::init() must be called afterwards.
    */
-  CollisionCheckerBase(): graph::core::CollisionCheckerBase(){}
+  MoveitCollisionCheckerPlugin():CollisionCheckerBasePlugin()
+  {}
 
   /**
-   * @brief Constructor for CollisionCheckerBase.
+   * @brief init Initialise the graph::ros1::MoveitCollisionChecker object, defining its main attributes.
+   * @param nh Ros node handle to read params from the ros parameters server. MoveitCollisionChecker requires group_name and collision_checker_min_step as parameters.
+   * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param logger Pointer to a TraceLogger for logging.
-   * @param min_distance Distance between configurations checked for collisions along a connection.
+   * @return True if correctly initialised, False if already initialised.
    */
-  CollisionCheckerBase(const cnr_logger::TraceLoggerPtr& logger, const double& min_distance = 0.01):
-    graph::core::CollisionCheckerBase(logger,min_distance){}
+  virtual bool init(const ros::NodeHandle& nh,
+                    const planning_scene::PlanningScenePtr& planning_scene,
+                    const cnr_logger::TraceLoggerPtr& logger) override
+  {
+    double collision_checker_min_step = 0.01;
+    std::string group_name = "manipulator";
+
+    if(not nh.getParam("collision_checker_min_step", collision_checker_min_step))
+      CNR_WARN(logger,"collision_checker_min_step not defined, using "<<collision_checker_min_step);
+
+    if(not nh.getParam("group_name", group_name))
+      CNR_WARN(logger,"group_name not defined, using "<<group_name);
+
+    collision_checker_ = std::make_shared<graph::ros1::MoveitCollisionChecker>(planning_scene,group_name,logger,collision_checker_min_step);
+
+    return true;
+  }
 
 };
 

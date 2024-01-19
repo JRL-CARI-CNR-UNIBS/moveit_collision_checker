@@ -38,11 +38,14 @@ include_directories(
 
 # Declare a C++ library
  add_library(${PROJECT_NAME}
-   src/${PROJECT_NAME}/collision_checkers/moveit_collision_checker.cpp
    src/${PROJECT_NAME}/collision_checkers/parallel_moveit_collision_checker.cpp
 
-   src/${PROJECT_NAME}/metrics/euclidean_metrics.cpp
+   src/${PROJECT_NAME}/plugins/collision_checkers/moveit_collision_checker_plugin.cpp
+   src/${PROJECT_NAME}/plugins/collision_checkers/parallel_moveit_collision_checker_plugin.cpp
 
+   src/${PROJECT_NAME}/plugins/metrics/euclidean_metrics_plugin.cpp
+
+   src/${PROJECT_NAME}/plugins/samplers/informed_sampler_plugin.cpp
    )
 
 target_link_libraries(${PROJECT_NAME}

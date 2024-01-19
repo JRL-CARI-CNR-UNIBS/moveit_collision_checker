@@ -1,3 +1,4 @@
+#pragma once
 /*
 Copyright (c) 2019, Manuel Beschi CNR-STIIMA manuel.beschi@stiima.cnr.it
 All rights reserved.
@@ -25,15 +26,59 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <graph_ros1/metrics/euclidean_metrics.h>
-#include <pluginlib/class_list_macros.h>
+#include <ros/ros.h>
+#include <graph_core/metrics/metrics_base.h>
 
 namespace graph
 {
 namespace ros1
 {
 
-PLUGINLIB_EXPORT_CLASS(EuclideanMetrics,MetricsBase)
+/**
+ * @class MetricsBasePlugin
+ * @brief This class implements a wrapper to graph::core::MetricsBase to allow its plugin to be defined.
+ * The class can be loaded as a plugin and builds a graph::core::MetricsBase object.
+ */
+class MetricsBasePlugin;
+typedef std::shared_ptr<MetricsBasePlugin> MetricsPluginPtr;
+
+class MetricsBasePlugin: public std::enable_shared_from_this<MetricsBasePlugin>
+{
+protected:
+
+  /**
+   * @brief metrics_ is the graph::core::MetricsBase object built and initialized by this plugin class.
+   */
+  graph::core::MetricsPtr metrics_;
+
+public:
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  /**
+   * @brief Empty constructor for MetricsBasePlugin. The function init() must be called afterwards.
+   */
+  MetricsBasePlugin()
+  {
+    metrics_ = nullptr;
+  }
+
+  /**
+   * @brief getMetrics return the grraph::core::MetricsPtr object built by the plugin.
+   * @return the graph::core::MetricsPtr object built.
+   */
+  virtual graph::core::MetricsPtr getMetrics()
+  {
+    return metrics_;
+  }
+
+  /**
+   * @brief init Initialise the graph::core::MetricsBase object, defining its main attributes.
+   * @param nh Ros node handle to read params from the ros parameters server.
+   * @param logger Pointer to a TraceLogger for logging.
+   * @return True if correctly initialised, False if already initialised.
+   */
+  virtual bool init(const ros::NodeHandle& nh, const cnr_logger::TraceLoggerPtr& logger) = 0;
+};
 
 } //namespace ros1
 } //namespace graph
