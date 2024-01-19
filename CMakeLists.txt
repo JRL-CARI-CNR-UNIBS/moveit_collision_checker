@@ -46,6 +46,11 @@ include_directories(
    src/${PROJECT_NAME}/plugins/metrics/euclidean_metrics_plugin.cpp
 
    src/${PROJECT_NAME}/plugins/samplers/informed_sampler_plugin.cpp
+
+   src/${PROJECT_NAME}/plugins/solvers/rrt_plugin.cpp
+   src/${PROJECT_NAME}/plugins/solvers/birrt_plugin.cpp
+   src/${PROJECT_NAME}/plugins/solvers/anytime_rrt_plugin.cpp
+   src/${PROJECT_NAME}/plugins/solvers/rrt_star_plugin.cpp
    )
 
 target_link_libraries(${PROJECT_NAME}

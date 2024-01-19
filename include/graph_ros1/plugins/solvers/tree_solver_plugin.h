@@ -63,6 +63,14 @@ public:
   }
 
   /**
+   * @brief Destructor of TreeSolverPlugin.
+   */
+  virtual ~TreeSolverPlugin()
+  {
+    solver_ = nullptr;
+  }
+
+  /**
    * @brief getSolver return the graph::core::TreeSolverPtr object built by the plugin.
    * @return the graph::core::TreeSolverPtr object built.
    */

@@ -25,15 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <graph_ros1/plugins/solvers/birrt_plugin.h>
+#include <graph_ros1/plugins/solvers/rrt_plugin.h>
 #include <pluginlib/class_list_macros.h>
 
-namespace graph
-{
-namespace ros1
-{
-
-PLUGINLIB_EXPORT_CLASS(BiRRTPlugin,TreeSolverPlugin)
-
-} //namespace ros1
-} //namespace graph
+PLUGINLIB_EXPORT_CLASS(graph::ros1::RRTPlugin,graph::ros1::TreeSolverPlugin)

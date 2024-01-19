@@ -28,12 +28,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <graph_ros1/plugins/collision_checkers/parallel_moveit_collision_checker_plugin.h>
 #include <pluginlib/class_list_macros.h>
 
-namespace graph
-{
-namespace ros1
-{
-
-PLUGINLIB_EXPORT_CLASS(ParallelMoveitCollisionCheckerPlugin,CollisionCheckerBasePlugin)
-
-} //namespace ros1
-} //namespace graph
+PLUGINLIB_EXPORT_CLASS(graph::ros1::ParallelMoveitCollisionCheckerPlugin,graph::ros1::CollisionCheckerBasePlugin)

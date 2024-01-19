@@ -63,6 +63,14 @@ public:
   }
 
   /**
+   * @brief Destructor for MetricsBasePlugin.
+   */
+  virtual ~MetricsBasePlugin()
+  {
+    metrics_ = nullptr;
+  }
+
+  /**
    * @brief getMetrics return the grraph::core::MetricsPtr object built by the plugin.
    * @return the graph::core::MetricsPtr object built.
    */

@@ -65,6 +65,14 @@ public:
   }
 
   /**
+   * @brief Destructor for CollisionCheckerBasePlugin.
+   */
+  virtual ~CollisionCheckerBasePlugin()
+  {
+    collision_checker_ = nullptr;
+  }
+
+  /**
    * @brief getCollisionChecker return the graph::core::CollisionCheckerPtr object built by the plugin.
    * @return the graph::core::CollisionCheckerPtr object built.
    */

@@ -63,6 +63,14 @@ public:
   }
 
   /**
+   * @brief Destructor for SamplerBasePlugin.
+   */
+  virtual ~SamplerBasePlugin()
+  {
+    sampler_ = nullptr;
+  }
+
+  /**
    * @brief getSampler return the grraph::core::SamplerPtr object built by the plugin.
    * @return the graph::core::SamplerPtr object built.
    */

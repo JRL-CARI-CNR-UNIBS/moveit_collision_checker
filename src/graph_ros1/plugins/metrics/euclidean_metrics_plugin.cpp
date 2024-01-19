@@ -28,12 +28,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <graph_ros1/plugins/metrics/euclidean_metrics_plugin.h>
 #include <pluginlib/class_list_macros.h>
 
-namespace graph
-{
-namespace ros1
-{
-
-PLUGINLIB_EXPORT_CLASS(EuclideanMetricsPlugin,MetricsBasePlugin)
-
-} //namespace ros1
-} //namespace graph
+PLUGINLIB_EXPORT_CLASS(graph::ros1::EuclideanMetricsPlugin,graph::ros1::MetricsBasePlugin)

@@ -1,8 +1,8 @@
 <library path="lib/libgraph_ros1">
-  <class type="graph::ros1::MoveitCollisionCheckerPlugin" base_class_type="graph::ros1::CollisionCheckerPluginBase">
+  <class type="graph::ros1::MoveitCollisionCheckerPlugin" base_class_type="graph::ros1::CollisionCheckerBasePlugin">
     <description>graph::ros1::MoveitCollisionChecker plugin</description>
   </class>
-  <class type="graph::ros1::ParallelMoveitCollisionCheckerPlugin" base_class_type="graph::ros1::CollisionCheckerPluginBase">
+  <class type="graph::ros1::ParallelMoveitCollisionCheckerPlugin" base_class_type="graph::ros1::CollisionCheckerBasePlugin">
     <description>graph::ros1::ParallelMoveitCollisionChecker plugin</description>
   </class>
 
