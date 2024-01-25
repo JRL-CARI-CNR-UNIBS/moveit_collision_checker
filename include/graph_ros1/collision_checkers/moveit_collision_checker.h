@@ -47,7 +47,7 @@ namespace ros1
  * using the MoveIt! library. It interacts with a MoveIt! PlanningScene to perform collision checks
  * for a specified joint group.
  */
-class MoveitCollisionChecker: public CollisionCheckerBase //graph::ros1::CollisionCheckerBase
+class MoveitCollisionChecker: public CollisionCheckerBase //graph::core::CollisionCheckerBase
 {
 protected:
   /**
