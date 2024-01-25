@@ -266,7 +266,7 @@ void ParallelMoveitCollisionChecker::setPlanningSceneMsg(const moveit_msgs::Plan
   for (int idx=0;idx<n_groups;idx++)
   {
     if(!futures.at(idx).get())
-      ROS_ERROR_THROTTLE(1,"unable to upload scene");
+      CNR_ERROR_THROTTLE(logger_,1,"unable to upload scene");
   }
 }
 
