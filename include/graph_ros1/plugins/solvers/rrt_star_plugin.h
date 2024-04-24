@@ -55,7 +55,8 @@ public:
 
   /**
    * @brief init Initialise the object, defining its main attributes.
-   * @param nh Ros node handle to read params from the ros parameters server.
+   * @param nh Ros node handle.
+   * @param param_ns defines the namespace under which parameter are searched for using cnr_param library.
    * @param metrics The metrics used to evaluate paths.
    * @param checker The collision checker for checking collisions.
    * @param sampler The sampler for generating random configurations.
@@ -64,6 +65,7 @@ public:
    * @return True if correctly initialised, False if already initialised.
    */
   virtual bool init(const ros::NodeHandle& nh,
+                    const std::string& param_ns,
                     const graph::core::MetricsPtr& metrics,
                     const graph::core::CollisionCheckerPtr& checker,
                     const graph::core::SamplerPtr& sampler,

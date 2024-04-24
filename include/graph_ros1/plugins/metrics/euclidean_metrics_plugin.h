@@ -55,10 +55,11 @@ public:
   /**
    * @brief init Initialise the object, defining its main attributes. At the end of the function, the flag 'init_' is set to true and the object can execute its main functions.
    * @param nh Ros node handle to read params from the ros parameters server.
+   * @param param_ns defines the namespace under which parameter are searched for using cnr_param library.
    * @param logger Pointer to a TraceLogger for logging.
    * @return True if correctly initialised, False if already initialised.
    */
-  virtual bool init(const ros::NodeHandle& nh, const cnr_logger::TraceLoggerPtr& logger) override
+  virtual bool init(const ros::NodeHandle& nh, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger) override
   {
     metrics_ = std::make_shared<graph::core::EuclideanMetrics>(logger);
     return true;

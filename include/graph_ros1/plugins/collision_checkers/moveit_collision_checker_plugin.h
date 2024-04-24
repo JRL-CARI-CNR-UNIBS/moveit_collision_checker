@@ -53,23 +53,22 @@ public:
 
   /**
    * @brief init Initialise the graph::ros1::MoveitCollisionChecker object, defining its main attributes.
-   * @param nh Ros node handle to read params from the ros parameters server. MoveitCollisionChecker requires group_name and checker_resolution as parameters.
+   * @param nh Ros node handle.
+   * @param param_ns defines the namespace under which parameter are searched for using cnr_param library.
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param logger Pointer to a TraceLogger for logging.
    * @return True if correctly initialised, False if already initialised.
    */
   virtual bool init(const ros::NodeHandle& nh,
+                    const std::string& param_ns,
                     const planning_scene::PlanningScenePtr& planning_scene,
                     const cnr_logger::TraceLoggerPtr& logger) override
   {
-    double checker_resolution = 0.01;
-    std::string group_name = "manipulator";
+    double checker_resolution;
+    graph::core::get_param(logger,param_ns,"checker_resolution",checker_resolution,0.01);
 
-    if(not nh.getParam("checker_resolution", checker_resolution))
-      CNR_WARN(logger,"checker_resolution not defined, using "<<checker_resolution);
-
-    if(not nh.getParam("group_name", group_name))
-      CNR_WARN(logger,"group_name not defined, using "<<group_name);
+    std::string group_name;
+    graph::core::get_param(logger,param_ns,"group_name",group_name,(std::string)"manipulator");
 
     collision_checker_ = std::make_shared<graph::ros1::MoveitCollisionChecker>(planning_scene,group_name,logger,checker_resolution);
 
