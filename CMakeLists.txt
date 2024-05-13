@@ -32,7 +32,6 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
   include
-  ${graph_core_INCLUDE_DIRS}
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -54,6 +53,6 @@ include_directories(
    )
 
 target_link_libraries(${PROJECT_NAME}
-  ${graph_core_LIBRARIES}
+  graph_core::graph_core
   ${catkin_LIBRARIES}
 )
