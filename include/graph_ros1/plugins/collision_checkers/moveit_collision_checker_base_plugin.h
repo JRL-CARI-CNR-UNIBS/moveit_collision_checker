@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <ros/ros.h>
 #include <moveit_msgs/PlanningScene.h>
+#include <cnr_class_loader/register_macro.hpp>
 #include <moveit/planning_scene/planning_scene.h>
 #include <graph_core/collision_checkers/collision_checker_base.h>
 
@@ -37,14 +38,14 @@ namespace ros1
 {
 
 /**
- * @class CollisionCheckerBasePlugin
- * @brief This class implements a wrapper to graph::core::CollisionCheckerBase to allow its plugin to be defined.
+ * @class MoveitCollisionCheckerBasePlugin
+ * @brief This class implements a base class wrapper for collision checker plugins implemented using Moveit.
  * The class can be loaded as a plugin and builds a graph::core::CollisionCheckerBase object.
  */
-class CollisionCheckerBasePlugin;
-typedef std::shared_ptr<CollisionCheckerBasePlugin> CollisionCheckerPluginPtr;
+class MoveitCollisionCheckerBasePlugin;
+typedef std::shared_ptr<MoveitCollisionCheckerBasePlugin> MoveitCollisionCheckerPluginPtr;
 
-class CollisionCheckerBasePlugin: std::enable_shared_from_this<CollisionCheckerBasePlugin>
+class MoveitCollisionCheckerBasePlugin: std::enable_shared_from_this<MoveitCollisionCheckerBasePlugin>
 {
 protected:
 
@@ -59,15 +60,15 @@ public:
   /**
    * @brief Empty constructor for CollisionCheckerBase. The function init() must be called afterwards.
    */
-  CollisionCheckerBasePlugin()
+  MoveitCollisionCheckerBasePlugin()
   {
     collision_checker_ = nullptr;
   }
 
   /**
-   * @brief Destructor for CollisionCheckerBasePlugin.
+   * @brief Destructor for MoveitCollisionCheckerBasePlugin.
    */
-  virtual ~CollisionCheckerBasePlugin()
+  virtual ~MoveitCollisionCheckerBasePlugin()
   {
     collision_checker_ = nullptr;
   }
@@ -83,17 +84,14 @@ public:
 
   /**
    * @brief init Initialise the graph::core::CollisionCheckerBase object, defining its main attributes.
-   * @param nh Ros node handle.
    * @param param_ns defines the namespace under which parameter are searched for using cnr_param library. MoveitCollisionChecker requires group_name and checker_resolution as parameters.
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param logger Pointer to a TraceLogger for logging.
    * @return True if correctly initialised, False if already initialised.
    */
-  virtual bool init(const ros::NodeHandle& nh,
-                    const std::string& param_ns,
+  virtual bool init(const std::string& param_ns,
                     const planning_scene::PlanningScenePtr& planning_scene,
-                    const cnr_logger::TraceLoggerPtr& logger) = 0;
-
+                    const cnr_logger::TraceLoggerPtr& logger)=0;
 };
 
 } //namespace ros1

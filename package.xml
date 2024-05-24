@@ -41,8 +41,4 @@
 <exec_depend>roscpp</exec_depend>
 <exec_depend>rviz_visual_tools</exec_depend>
 
-<export>
-  <graph_ros1 plugin="${prefix}/plugin.xml" />
-</export>
-
 </package>

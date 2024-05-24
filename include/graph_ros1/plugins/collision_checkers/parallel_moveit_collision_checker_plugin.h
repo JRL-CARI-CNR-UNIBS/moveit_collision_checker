@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <graph_ros1/plugins/collision_checkers/collision_checker_base_plugin.h>
+#include <graph_ros1/plugins/collision_checkers/moveit_collision_checker_base_plugin.h>
 #include <graph_ros1/collision_checkers/parallel_moveit_collision_checker.h>
 
 namespace graph
@@ -38,7 +38,7 @@ namespace ros1
  * @class ParallelMoveitCollisionCheckerPlugin
  * @brief This class implements a wrapper to graph::ros1::ParallelMoveitCollisionChecker to allow its plugin to be defined.
  */
-class ParallelMoveitCollisionCheckerPlugin: public CollisionCheckerBasePlugin
+class ParallelMoveitCollisionCheckerPlugin: public MoveitCollisionCheckerBasePlugin
 {
 protected:
 
@@ -48,19 +48,17 @@ public:
   /**
    * @brief Empty constructor for ParallelMoveitCollisionCheckerPlugin. The function ParallelMoveitCollisionCheckerPlugin::init() must be called afterwards.
    */
-  ParallelMoveitCollisionCheckerPlugin():CollisionCheckerBasePlugin()
+  ParallelMoveitCollisionCheckerPlugin():MoveitCollisionCheckerBasePlugin()
   {}
 
   /**
    * @brief init Initialise the graph::ros1::ParallelMoveitCollisionChecker object, defining its main attributes.
-   * @param nh Ros node handle to read params from the ros parameters server.
    * @param param_ns defines the namespace under which parameter are searched for using cnr_param library.
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param logger Pointer to a TraceLogger for logging.
    * @return True if correctly initialised, False if already initialised.
    */
-  virtual bool init(const ros::NodeHandle& nh,
-                    const std::string& param_ns,
+  virtual bool init(const std::string& param_ns,
                     const planning_scene::PlanningScenePtr& planning_scene,
                     const cnr_logger::TraceLoggerPtr& logger) override
   {
