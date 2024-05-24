@@ -26,8 +26,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <graph_ros1/plugins/collision_checkers/moveit_collision_checker_base_plugin.h>
-#include <graph_ros1/collision_checkers/parallel_moveit_collision_checker.h>
+#include <moveit_collision_checker/plugins/collision_checkers/moveit_collision_checker_base_plugin.h>
+#include <moveit_collision_checker/collision_checkers/parallel_moveit_collision_checker.h>
 
 namespace graph
 {

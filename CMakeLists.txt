@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(graph_ros1)
+project(moveit_collision_checker)
 
 add_compile_options(-std=c++17 -funroll-loops -Wall -Ofast)
 #set(CMAKE_BUILD_TYPE Release)
@@ -19,7 +19,7 @@ find_package(graph_core REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES graph_ros1
+  LIBRARIES moveit_collision_checker
   CATKIN_DEPENDS actionlib moveit_core moveit_ros_planning moveit_ros_planning_interface moveit_visual_tools roscpp rviz_visual_tools
   DEPENDS graph_core
   )
