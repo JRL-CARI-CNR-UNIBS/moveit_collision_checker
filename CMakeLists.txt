@@ -5,23 +5,27 @@ add_compile_options(-std=c++2a -funroll-loops -Wall -Ofast)
 #set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_BUILD_TYPE Debug)
 
-find_package(catkin REQUIRED COMPONENTS
-  actionlib
-  moveit_core
-  moveit_ros_planning
-  moveit_ros_planning_interface
-  moveit_visual_tools
-  roscpp
-  rviz_visual_tools
+set(DEPS
+    graph_core::graph_core
 )
+
+set(ROS_DEPS
+    moveit_core
+    roscpp
+)
+
+find_package(catkin REQUIRED COMPONENTS
+${ROS_DEPS}
+)
+find_package(graph_core REQUIRED)
 
 find_package(graph_core REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES moveit_collision_checker
-  CATKIN_DEPENDS actionlib moveit_core moveit_ros_planning moveit_ros_planning_interface moveit_visual_tools roscpp rviz_visual_tools
-  DEPENDS graph_core
+  CATKIN_DEPENDS ${ROS_DEPS}
+  DEPENDS ${DEPS}
   )
 
 ###########
@@ -44,6 +48,6 @@ include_directories(
    )
 
 target_link_libraries(${PROJECT_NAME}
-  graph_core::graph_core
+  ${DEPS}
   ${catkin_LIBRARIES}
 )
