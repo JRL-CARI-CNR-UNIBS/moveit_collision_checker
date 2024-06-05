@@ -37,7 +37,7 @@ namespace graph
 
 using namespace graph::core;
 
-namespace ros1
+namespace ros2
 {
 
 /**
@@ -121,7 +121,7 @@ protected:
    * @param idx Index of the first thread to update.
    * @return True if successful, false otherwise.
    */
-  bool asyncSetPlanningSceneMsg(const moveit_msgs::PlanningScene& msg, const int &idx);
+  bool asyncSetPlanningSceneMsg(const moveit_msgs::msg::PlanningScene& msg, const int &idx);
 
   /**
    * @brief Asynchronously clone and set the PlanningScene for a group of threads.
@@ -155,7 +155,7 @@ public:
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param group_name Name of the joint group for collision checking.
    * @param logger Pointer to the logger for logging messages.
-   * @param threads_num Number of parallel threads for collision checking (default is 4).
+   * @param threads_num Number of parallel tros1hreads for collision checking (default is 4).
    * @param min_distance Minimum distance for collision checking (default is 0.01).
    */
   ParallelMoveitCollisionChecker(const planning_scene::PlanningScenePtr& planning_scene,
@@ -189,7 +189,7 @@ public:
    *
    * @param msg The PlanningScene message.
    */
-  virtual void setPlanningSceneMsg(const moveit_msgs::PlanningScene& msg) override;
+  virtual void setPlanningSceneMsg(const moveit_msgs::msg::PlanningScene& msg) override;
 
   /**
    * @brief Set the PlanningScene for the entire group of threads.
@@ -217,5 +217,5 @@ public:
 
 };
 
-} //namespace ros1
+} //namespace ros2
 } //namespace graph

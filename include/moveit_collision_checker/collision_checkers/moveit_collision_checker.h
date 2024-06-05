@@ -26,8 +26,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <ros/ros.h>
-#include <moveit_msgs/PlanningScene.h>
+#include <rclcpp/rclcpp.hpp>
+#include <moveit_msgs/msg/planning_scene.hpp>
 #include <moveit/planning_scene/planning_scene.h>
 #include <graph_core/collision_checkers/collision_checker_base.h>
 
@@ -36,7 +36,7 @@ namespace graph
 
 using namespace graph::core;
 
-namespace ros1
+namespace ros2
 {
 
 /**
@@ -56,9 +56,9 @@ protected:
   planning_scene::PlanningScenePtr planning_scene_;
 
   /**
-   * @brief state_ Pointer to the current state of the robot (robot_state::RobotState) used for collision checking..
+   * @brief state_ Pointer to the current state of the robot (moveit::core::RobotState) used for collision checking.
    */
-  robot_state::RobotStatePtr state_;
+  moveit::core::RobotStatePtr state_;
 
   /**
    * @brief group_name_  Name of the joint group to consider for collision checking.
@@ -120,7 +120,7 @@ public:
     group_name_(group_name),
     logger_(logger)
   {
-    state_ = std::make_shared<robot_state::RobotState>(planning_scene_->getCurrentState());
+    state_ = std::make_shared<moveit::core::RobotState>(planning_scene_->getCurrentState());
     jmg_ = state_->getJointModelGroup(group_name_);
     joint_names_=jmg_->getActiveJointModelNames();
     joint_models_=jmg_->getActiveJointModels();
@@ -148,7 +148,7 @@ public:
     planning_scene_ = planning_scene;
     group_name_ = group_name;
 
-    state_ = std::make_shared<robot_state::RobotState>(planning_scene_->getCurrentState());
+    state_ = std::make_shared<moveit::core::RobotState>(planning_scene_->getCurrentState());
     jmg_ = state_->getJointModelGroup(group_name_);
     joint_names_=jmg_->getActiveJointModelNames();
     joint_models_=jmg_->getActiveJointModels();
@@ -165,7 +165,7 @@ public:
    *
    * @param msg The PlanningScene message.
    */
-  virtual void setPlanningSceneMsg(const moveit_msgs::PlanningScene& msg)
+  virtual void setPlanningSceneMsg(const moveit_msgs::msg::PlanningScene& msg)
   {
     if (!planning_scene_->usePlanningSceneMsg(msg))
       CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
@@ -238,5 +238,5 @@ public:
 
 };
 
-} //namespace ros1
+} //namespace ros2
 } //namespace graph

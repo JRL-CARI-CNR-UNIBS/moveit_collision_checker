@@ -26,15 +26,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <ros/ros.h>
-#include <moveit_msgs/PlanningScene.h>
+#include <rclcpp/rclcpp.hpp>
+#include <moveit_msgs/msg/planning_scene.hpp>
 #include <cnr_class_loader/register_macro.hpp>
 #include <moveit/planning_scene/planning_scene.h>
 #include <graph_core/collision_checkers/collision_checker_base.h>
 
 namespace graph
 {
-namespace ros1
+namespace ros2
 {
 
 /**
@@ -94,5 +94,5 @@ public:
                     const cnr_logger::TraceLoggerPtr& logger)=0;
 };
 
-} //namespace ros1
+} //namespace ros2
 } //namespace graph
