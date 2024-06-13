@@ -35,7 +35,7 @@ add_library(${PROJECT_NAME} SHARED
             src/${PROJECT_NAME}/plugins/collision_checkers/moveit_collision_checker_plugin.cpp
             src/${PROJECT_NAME}/plugins/collision_checkers/parallel_moveit_collision_checker_plugin.cpp
  )
- target_link_libraries(${PROJECT_NAME} PUBLIC ${DEPS_TARGET})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${DEPS_TARGET})
  target_include_directories(${PROJECT_NAME} PUBLIC
    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
    $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
@@ -49,6 +49,7 @@ add_library(${PROJECT_NAME} SHARED
  ARCHIVE DESTINATION lib
  LIBRARY DESTINATION lib
  RUNTIME DESTINATION bin
+ INCLUDES DESTINATION include
 )
 
 install(
