@@ -36,7 +36,7 @@ namespace graph
 
 using namespace graph::core;
 
-namespace ros1
+namespace collision_check
 {
 
 /**
@@ -238,5 +238,5 @@ public:
 
 };
 
-} //namespace ros1
+} //namespace collision_check
 } //namespace graph

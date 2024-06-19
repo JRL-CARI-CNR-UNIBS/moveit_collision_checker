@@ -31,12 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace graph
 {
-namespace ros1
+namespace collision_check
 {
 
 /**
  * @class ParallelMoveitCollisionCheckerPlugin
- * @brief This class implements a wrapper to graph::ros1::ParallelMoveitCollisionChecker to allow its plugin to be defined.
+ * @brief This class implements a wrapper to graph::collision_check::ParallelMoveitCollisionChecker to allow its plugin to be defined.
  */
 class ParallelMoveitCollisionCheckerPlugin: public MoveitCollisionCheckerBasePlugin
 {
@@ -52,7 +52,7 @@ public:
   {}
 
   /**
-   * @brief init Initialise the graph::ros1::ParallelMoveitCollisionChecker object, defining its main attributes.
+   * @brief init Initialise the graph::collision_check::ParallelMoveitCollisionChecker object, defining its main attributes.
    * @param param_ns defines the namespace under which parameter are searched for using cnr_param library.
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param logger Pointer to a TraceLogger for logging.
@@ -71,12 +71,12 @@ public:
     int parallel_checker_n_threads = 4;
     graph::core::get_param(logger,param_ns,"parallel_checker_n_threads",parallel_checker_n_threads,4);
 
-    collision_checker_ = std::make_shared<graph::ros1::ParallelMoveitCollisionChecker>(planning_scene,group_name,logger,parallel_checker_n_threads,checker_resolution);
+    collision_checker_ = std::make_shared<graph::collision_check::ParallelMoveitCollisionChecker>(planning_scene,group_name,logger,parallel_checker_n_threads,checker_resolution);
 
     return true;
   }
 
 };
 
-} //namespace ros1
+} //namespace collision_check
 } //namespace graph

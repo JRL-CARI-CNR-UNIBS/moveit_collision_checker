@@ -29,4 +29,4 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /**
  * @brief Register class to be loaded with cnr_class_loader
  */
-CLASS_LOADER_REGISTER_CLASS(graph::ros1::MoveitCollisionCheckerPlugin,graph::ros1::MoveitCollisionCheckerBasePlugin)
+CLASS_LOADER_REGISTER_CLASS(graph::collision_check::MoveitCollisionCheckerPlugin,graph::collision_check::MoveitCollisionCheckerBasePlugin)

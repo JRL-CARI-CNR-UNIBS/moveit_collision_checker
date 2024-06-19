@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace graph
 {
-namespace ros1
+namespace collision_check
 {
 
 ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_scene::PlanningScenePtr &planning_scene,
@@ -404,5 +404,5 @@ CollisionCheckerPtr ParallelMoveitCollisionChecker::clone()
   planning_scene::PlanningScenePtr planning_scene = planning_scene::PlanningScene::clone(planning_scene_);
   return std::make_shared<ParallelMoveitCollisionChecker>(planning_scene,group_name_,logger_,threads_num_,min_distance_);
 }
-} //namespace ros1
+} //namespace collision_check
 } //namespace graph
