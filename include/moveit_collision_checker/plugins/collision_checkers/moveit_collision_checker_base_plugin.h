@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace graph
 {
-namespace ros2
+namespace collision_check
 {
 
 /**
@@ -94,5 +94,5 @@ public:
                     const cnr_logger::TraceLoggerPtr& logger)=0;
 };
 
-} //namespace ros2
+} //namespace collision_check
 } //namespace graph

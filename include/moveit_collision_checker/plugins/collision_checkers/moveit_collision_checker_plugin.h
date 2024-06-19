@@ -31,12 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace graph
 {
-namespace ros2
+namespace collision_check
 {
 
 /**
  * @class MoveitCollisionCheckerPlugin
- * @brief This class implements a wrapper to graph::ros2::MoveitCollisionChecker to allow its plugin to be defined.
+ * @brief This class implements a wrapper to graph::collision_check::MoveitCollisionChecker to allow its plugin to be defined.
  */
 class MoveitCollisionCheckerPlugin: public MoveitCollisionCheckerBasePlugin
 {
@@ -52,7 +52,7 @@ public:
   {}
 
   /**
-   * @brief init Initialise the graph::ros2::MoveitCollisionChecker object, defining its main attributes.
+   * @brief init Initialise the graph::collision_check::MoveitCollisionChecker object, defining its main attributes.
    * @param param_ns defines the namespace under which parameter are searched for using cnr_param library.
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param logger Pointer to a TraceLogger for logging.
@@ -68,12 +68,12 @@ public:
     std::string group_name;
     graph::core::get_param(logger,param_ns,"group_name",group_name,(std::string)"manipulator");
 
-    collision_checker_ = std::make_shared<graph::ros2::MoveitCollisionChecker>(planning_scene,group_name,logger,checker_resolution);
+    collision_checker_ = std::make_shared<graph::collision_check::MoveitCollisionChecker>(planning_scene,group_name,logger,checker_resolution);
 
     return true;
   }
 
 };
 
-} //namespace ros2
+} //namespace collision_check
 } //namespace graph
