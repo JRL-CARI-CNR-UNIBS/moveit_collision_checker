@@ -47,6 +47,9 @@ namespace collision_check
  * This class extends the MoveitCollisionChecker and adds parallel collision checking functionality
  * by distributing collision checks across multiple threads.
  */
+class ParallelMoveitCollisionChecker;
+typedef std::shared_ptr<ParallelMoveitCollisionChecker> ParallelMoveitCollisionCheckerPtr;
+
 class ParallelMoveitCollisionChecker: public MoveitCollisionChecker
 {
 #define GROUP_SIZE 10

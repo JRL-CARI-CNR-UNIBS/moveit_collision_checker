@@ -47,6 +47,9 @@ namespace collision_check
  * using the MoveIt! library. It interacts with a MoveIt! PlanningScene to perform collision checks
  * for a specified joint group.
  */
+class MoveitCollisionChecker;
+typedef std::shared_ptr<MoveitCollisionChecker> MoveitCollisionCheckerPtr;
+
 class MoveitCollisionChecker: public CollisionCheckerBase //graph::core::CollisionCheckerBase
 {
 protected:
