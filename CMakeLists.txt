@@ -14,12 +14,10 @@ set(ROS_DEPS
     roscpp
 )
 
+find_package(graph_core REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
 ${ROS_DEPS}
 )
-find_package(graph_core REQUIRED)
-
-find_package(graph_core REQUIRED)
 
 catkin_package(
   INCLUDE_DIRS include
@@ -47,7 +45,7 @@ include_directories(
    src/${PROJECT_NAME}/plugins/collision_checkers/parallel_moveit_collision_checker_plugin.cpp
    )
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PUBLIC
   ${DEPS}
   ${catkin_LIBRARIES}
 )
