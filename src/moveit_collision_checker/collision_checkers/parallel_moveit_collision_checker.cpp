@@ -50,6 +50,9 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
   stop_check_=true;
   thread_iter_=0;
 
+  queues_.clear();
+  planning_scenes_.clear();
+
   threads_.resize(threads_num_);
   for (int idx=0;idx<threads_num_;idx++)
   {
@@ -84,6 +87,9 @@ bool ParallelMoveitCollisionChecker::init(const planning_scene::PlanningScenePtr
   at_least_a_collision_=false;
   stop_check_=true;
   thread_iter_=0;
+
+  queues_.clear();
+  planning_scenes_.clear();
 
   threads_.resize(threads_num_);
   for (int idx=0;idx<threads_num_;idx++)
