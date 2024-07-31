@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019, Manuel Beschi CNR-STIIMA manuel.beschi@stiima.cnr.it
+Copyright (c) 2024, Manuel Beschi and Cesare Tonola, UNIBS and CNR-STIIMA, manuel.beschi@unibs.it, c.tonola001@unibs.it
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -58,8 +58,9 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
     planning_scenes_.push_back(planning_scene::PlanningScene::clone(planning_scene_));
     queues_.push_back(std::vector<std::vector<double>>());
   }
-
+  
   pool_ = std::make_shared<BS::thread_pool>(threads_num_);
+
 }
 
 bool ParallelMoveitCollisionChecker::init(const planning_scene::PlanningScenePtr& planning_scene,
@@ -175,7 +176,8 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
     }
 
     state->update();
-    
+    //    state->updateCollisionBodyTransforms(); //update() already calls it
+
     if (!state->satisfiesBounds(jmg_))
     {
       at_least_a_collision_=true;
@@ -183,8 +185,6 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
       break;
     }
     
-    state->updateCollisionBodyTransforms();
-
     if (planning_scenes_.at(thread_idx)->isStateColliding(*state,group_name_))
     {
       at_least_a_collision_=true;
