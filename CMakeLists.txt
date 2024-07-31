@@ -40,7 +40,6 @@ include_directories(
 # Declare a C++ library
  add_library(${PROJECT_NAME}
    src/${PROJECT_NAME}/collision_checkers/parallel_moveit_collision_checker.cpp
-   src/${PROJECT_NAME}/collision_checkers/thread_pool_moveit_collision_checker.cpp
 
    src/${PROJECT_NAME}/plugins/collision_checkers/moveit_collision_checker_plugin.cpp
    src/${PROJECT_NAME}/plugins/collision_checkers/parallel_moveit_collision_checker_plugin.cpp

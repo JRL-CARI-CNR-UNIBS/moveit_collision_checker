@@ -33,10 +33,10 @@ namespace collision_check
 {
 
 ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_scene::PlanningScenePtr &planning_scene,
-                                                               const std::string& group_name,
-                                                               const cnr_logger::TraceLoggerPtr& logger,
-                                                               const int& threads_num,
-                                                               const double& min_distance):
+                                                                   const std::string& group_name,
+                                                                   const cnr_logger::TraceLoggerPtr& logger,
+                                                                   const int& threads_num,
+                                                                   const double& min_distance):
   MoveitCollisionChecker(planning_scene,group_name,logger,min_distance),
   threads_num_(threads_num)
 {
@@ -53,25 +53,20 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
   queues_.clear();
   planning_scenes_.clear();
 
-  threads_.resize(threads_num_);
   for (int idx=0;idx<threads_num_;idx++)
   {
     planning_scenes_.push_back(planning_scene::PlanningScene::clone(planning_scene_));
     queues_.push_back(std::vector<std::vector<double>>());
   }
 
-  //  req_.distance=false;
-  //  req_.group_name=group_name;
-  //  req_.verbose=false;
-  //  req_.contacts=false;
-  //  req_.cost=false;
+  pool_ = std::make_shared<BS::thread_pool>(threads_num_);
 }
 
 bool ParallelMoveitCollisionChecker::init(const planning_scene::PlanningScenePtr& planning_scene,
-                                          const std::string& group_name,
-                                          const cnr_logger::TraceLoggerPtr& logger,
-                                          const int& threads_num,
-                                          const double& min_distance)
+                                            const std::string& group_name,
+                                            const cnr_logger::TraceLoggerPtr& logger,
+                                            const int& threads_num,
+                                            const double& min_distance)
 {
   if(not MoveitCollisionChecker::init(planning_scene,group_name,logger,min_distance))
     return false;
@@ -91,12 +86,13 @@ bool ParallelMoveitCollisionChecker::init(const planning_scene::PlanningScenePtr
   queues_.clear();
   planning_scenes_.clear();
 
-  threads_.resize(threads_num_);
   for (int idx=0;idx<threads_num_;idx++)
   {
     planning_scenes_.push_back(planning_scene::PlanningScene::clone(planning_scene_));
     queues_.push_back(std::vector<std::vector<double>>());
   }
+
+  pool_ = std::make_shared<BS::thread_pool>(threads_num_);
 
   return true;
 }
@@ -107,12 +103,15 @@ void ParallelMoveitCollisionChecker::resetQueue()
   stop_check_=true;
 
   thread_iter_=0;
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
+
+  pool_->purge();
+
   for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
     queues_.at(idx).clear();
-  }
 }
 
 void ParallelMoveitCollisionChecker::queueUp(const Eigen::VectorXd &q)
@@ -137,24 +136,26 @@ void ParallelMoveitCollisionChecker::queueUp(const Eigen::VectorXd &q)
 
 bool ParallelMoveitCollisionChecker::checkAllQueues()
 {
-  assert(queues_.size() == threads_.size());
-  assert(size_t(threads_num_) == threads_.size());
-
   stop_check_=false;
 
   for (int idx=0;idx<threads_num_;idx++)
   {
-    if (queues_.at(idx).size()>0)
+    if(queues_.at(idx).size()>0)
     {
-      threads_.at(idx)=std::thread(&ParallelMoveitCollisionChecker::collisionThread,this,idx);
+      pool_->detach_task(
+            [idx,this]
+      {
+        this->collisionThread(idx);
+      });
     }
   }
-  for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
-  }
-  return  !at_least_a_collision_;
+
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
+
+  return !at_least_a_collision_;
 }
 
 void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
@@ -171,7 +172,6 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
     for (size_t ij=0;ij<joint_names_.size();ij++)
     {
       state->setJointPositions(joint_models_.at(ij),&configuration.at(ij));
-
     }
 
     state->update();
@@ -199,11 +199,13 @@ ParallelMoveitCollisionChecker::~ParallelMoveitCollisionChecker()
   CNR_DEBUG(logger_,"Closing collision threads");
   stop_check_=true;
 
-  for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
-  }
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
+
+  pool_->purge();
+
   CNR_DEBUG(logger_,"Collision threads closed");
 }
 
@@ -242,15 +244,13 @@ void ParallelMoveitCollisionChecker::setPlanningSceneMsg(const moveit_msgs::Plan
 {
   stop_check_=true;
 
-  for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
-  }
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
 
   if (!planning_scene_->usePlanningSceneMsg(msg))
     CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
-
 
   int n_groups = std::floor(threads_num_/GROUP_SIZE);
   if(threads_num_%GROUP_SIZE == 0 && n_groups != 0)
@@ -280,11 +280,11 @@ void ParallelMoveitCollisionChecker::setPlanningScene(planning_scene::PlanningSc
 {
   stop_check_=true;
 
-  for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
-  }
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
+
   planning_scene_ = planning_scene;
 
   int n_groups = std::floor(threads_num_/GROUP_SIZE);
@@ -312,7 +312,7 @@ void ParallelMoveitCollisionChecker::setPlanningScene(planning_scene::PlanningSc
 }
 
 void ParallelMoveitCollisionChecker::queueConnection(const Eigen::VectorXd& configuration1,
-                                                     const Eigen::VectorXd& configuration2)
+                                                       const Eigen::VectorXd& configuration2)
 {
   double distance = (configuration2 - configuration1).norm();
   if (distance < min_distance_)
@@ -333,7 +333,7 @@ void ParallelMoveitCollisionChecker::queueConnection(const Eigen::VectorXd& conf
 }
 
 bool ParallelMoveitCollisionChecker::checkConnection(const Eigen::VectorXd& configuration1,
-                                                     const Eigen::VectorXd& configuration2)
+                                                       const Eigen::VectorXd& configuration2)
 {
   resetQueue();
   if (!check(configuration1))
@@ -345,7 +345,7 @@ bool ParallelMoveitCollisionChecker::checkConnection(const Eigen::VectorXd& conf
 }
 
 bool ParallelMoveitCollisionChecker::checkConnFromConf(const ConnectionPtr& conn,
-                                                       const Eigen::VectorXd& this_conf)
+                                                         const Eigen::VectorXd& this_conf)
 {
   resetQueue();
   Eigen::VectorXd parent = conn->getParent()->getConfiguration();
