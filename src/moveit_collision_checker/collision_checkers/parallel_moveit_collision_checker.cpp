@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019, Manuel Beschi CNR-STIIMA manuel.beschi@stiima.cnr.it
+Copyright (c) 2024, Manuel Beschi and Cesare Tonola, UNIBS and CNR-STIIMA, manuel.beschi@unibs.it, c.tonola001@unibs.it
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -50,18 +50,17 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
   stop_check_=true;
   thread_iter_=0;
 
-  threads_.resize(threads_num_);
+  queues_.clear();
+  planning_scenes_.clear();
+
   for (int idx=0;idx<threads_num_;idx++)
   {
     planning_scenes_.push_back(planning_scene::PlanningScene::clone(planning_scene_));
     queues_.push_back(std::vector<std::vector<double>>());
   }
+  
+  pool_ = std::make_shared<BS::thread_pool>(threads_num_);
 
-  //  req_.distance=false;
-  //  req_.group_name=group_name;
-  //  req_.verbose=false;
-  //  req_.contacts=false;
-  //  req_.cost=false;
 }
 
 bool ParallelMoveitCollisionChecker::init(const planning_scene::PlanningScenePtr& planning_scene,
@@ -85,12 +84,16 @@ bool ParallelMoveitCollisionChecker::init(const planning_scene::PlanningScenePtr
   stop_check_=true;
   thread_iter_=0;
 
-  threads_.resize(threads_num_);
+  queues_.clear();
+  planning_scenes_.clear();
+
   for (int idx=0;idx<threads_num_;idx++)
   {
     planning_scenes_.push_back(planning_scene::PlanningScene::clone(planning_scene_));
     queues_.push_back(std::vector<std::vector<double>>());
   }
+
+  pool_ = std::make_shared<BS::thread_pool>(threads_num_);
 
   return true;
 }
@@ -101,12 +104,15 @@ void ParallelMoveitCollisionChecker::resetQueue()
   stop_check_=true;
 
   thread_iter_=0;
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
+
+  pool_->purge();
+
   for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
     queues_.at(idx).clear();
-  }
 }
 
 void ParallelMoveitCollisionChecker::queueUp(const Eigen::VectorXd &q)
@@ -131,24 +137,26 @@ void ParallelMoveitCollisionChecker::queueUp(const Eigen::VectorXd &q)
 
 bool ParallelMoveitCollisionChecker::checkAllQueues()
 {
-  assert(queues_.size() == threads_.size());
-  assert(size_t(threads_num_) == threads_.size());
-
   stop_check_=false;
 
   for (int idx=0;idx<threads_num_;idx++)
   {
-    if (queues_.at(idx).size()>0)
+    if(queues_.at(idx).size()>0)
     {
-      threads_.at(idx)=std::thread(&ParallelMoveitCollisionChecker::collisionThread,this,idx);
+      pool_->detach_task(
+            [idx,this]
+      {
+        this->collisionThread(idx);
+      });
     }
   }
-  for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
-  }
-  return  !at_least_a_collision_;
+
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
+
+  return !at_least_a_collision_;
 }
 
 void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
@@ -165,11 +173,11 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
     for (size_t ij=0;ij<joint_names_.size();ij++)
     {
       state->setJointPositions(joint_models_.at(ij),&configuration.at(ij));
-
     }
 
     state->update();
-    
+    //    state->updateCollisionBodyTransforms(); //update() already calls it
+
     if (!state->satisfiesBounds(jmg_))
     {
       at_least_a_collision_=true;
@@ -177,8 +185,6 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
       break;
     }
     
-    state->updateCollisionBodyTransforms();
-
     if (planning_scenes_.at(thread_idx)->isStateColliding(*state,group_name_))
     {
       at_least_a_collision_=true;
@@ -193,11 +199,13 @@ ParallelMoveitCollisionChecker::~ParallelMoveitCollisionChecker()
   CNR_DEBUG(logger_,"Closing collision threads");
   stop_check_=true;
 
-  for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
-  }
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
+
+  pool_->purge();
+
   CNR_DEBUG(logger_,"Collision threads closed");
 }
 
@@ -236,15 +244,13 @@ void ParallelMoveitCollisionChecker::setPlanningSceneMsg(const moveit_msgs::msg:
 {
   stop_check_=true;
 
-  for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
-  }
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
 
   if (!planning_scene_->usePlanningSceneMsg(msg))
     CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
-
 
   int n_groups = std::floor(threads_num_/GROUP_SIZE);
   if(threads_num_%GROUP_SIZE == 0 && n_groups != 0)
@@ -274,11 +280,11 @@ void ParallelMoveitCollisionChecker::setPlanningScene(planning_scene::PlanningSc
 {
   stop_check_=true;
 
-  for (int idx=0;idx<threads_num_;idx++)
-  {
-    if (threads_.at(idx).joinable())
-      threads_.at(idx).join();
-  }
+  pool_->wait();
+  assert(pool_->get_tasks_total  () == 0);
+  assert(pool_->get_tasks_queued () == 0);
+  assert(pool_->get_tasks_running() == 0);
+
   planning_scene_ = planning_scene;
 
   int n_groups = std::floor(threads_num_/GROUP_SIZE);

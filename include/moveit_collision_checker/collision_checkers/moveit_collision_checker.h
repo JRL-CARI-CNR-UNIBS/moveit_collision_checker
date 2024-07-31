@@ -198,14 +198,15 @@ public:
     for (size_t ij=0;ij<joint_names_.size();ij++)
       state_->setJointPositions(joint_models_.at(ij),&configuration(ij));
 
+    state_->update();
+    //    state_->updateCollisionBodyTransforms(); update() already calls it
 
     if (!state_->satisfiesBounds(jmg_))
     {
       CNR_DEBUG(logger_,"Out of bound");
       return false;
     }
-    state_->update();
-    state_->updateCollisionBodyTransforms();
+
     return !planning_scene_->isStateColliding(*state_,group_name_);
   }
 
