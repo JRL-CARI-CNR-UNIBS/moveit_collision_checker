@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019, Manuel Beschi CNR-STIIMA manuel.beschi@stiima.cnr.it
+Copyright (c) 2024, Manuel Beschi and Cesare Tonola, UNIBS and CNR-STIIMA, manuel.beschi@unibs.it, c.tonola001@unibs.it
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -59,12 +59,6 @@ ParallelMoveitCollisionChecker::ParallelMoveitCollisionChecker(const planning_sc
     planning_scenes_.push_back(planning_scene::PlanningScene::clone(planning_scene_));
     queues_.push_back(std::vector<std::vector<double>>());
   }
-
-  //  req_.distance=false;
-  //  req_.group_name=group_name;
-  //  req_.verbose=false;
-  //  req_.contacts=false;
-  //  req_.cost=false;
 }
 
 bool ParallelMoveitCollisionChecker::init(const planning_scene::PlanningScenePtr& planning_scene,
@@ -171,11 +165,11 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
     for (size_t ij=0;ij<joint_names_.size();ij++)
     {
       state->setJointPositions(joint_models_.at(ij),&configuration.at(ij));
-
     }
 
     state->update();
-    
+    //    state->updateCollisionBodyTransforms(); //update() already calls it
+
     if (!state->satisfiesBounds(jmg_))
     {
       at_least_a_collision_=true;
@@ -183,8 +177,6 @@ void ParallelMoveitCollisionChecker::collisionThread(int thread_idx)
       break;
     }
     
-    state->updateCollisionBodyTransforms();
-
     if (planning_scenes_.at(thread_idx)->isStateColliding(*state,group_name_))
     {
       at_least_a_collision_=true;
