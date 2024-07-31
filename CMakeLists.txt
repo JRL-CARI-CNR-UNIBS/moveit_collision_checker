@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.0.2)
 project(moveit_collision_checker)
 
 add_compile_options(-std=c++2a -funroll-loops -Wall -Ofast)
-#set(CMAKE_BUILD_TYPE Release)
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
 
 set(DEPS
     graph_core::graph_core
@@ -40,6 +40,7 @@ include_directories(
 # Declare a C++ library
  add_library(${PROJECT_NAME}
    src/${PROJECT_NAME}/collision_checkers/parallel_moveit_collision_checker.cpp
+   src/${PROJECT_NAME}/collision_checkers/thread_pool_moveit_collision_checker.cpp
 
    src/${PROJECT_NAME}/plugins/collision_checkers/moveit_collision_checker_plugin.cpp
    src/${PROJECT_NAME}/plugins/collision_checkers/parallel_moveit_collision_checker_plugin.cpp
@@ -60,6 +61,8 @@ install(TARGETS ${PROJECT_NAME}
 ## Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
+  FILES_MATCHING
+  PATTERN "*.h"
+  PATTERN "*.hpp"
   PATTERN ".svn" EXCLUDE
 )
