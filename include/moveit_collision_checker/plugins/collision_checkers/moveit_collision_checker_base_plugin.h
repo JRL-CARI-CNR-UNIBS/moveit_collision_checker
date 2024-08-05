@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cnr_class_loader/register_macro.hpp>
 #include <moveit/planning_scene/planning_scene.h>
 #include <graph_core/collision_checkers/collision_checker_base.h>
+#include <moveit_collision_checker/collision_checkers/moveit_collision_checker.h>
 
 namespace graph
 {
@@ -52,7 +53,7 @@ protected:
   /**
    * @brief collision_checker_ is the graph::core::CollisionCheckerBase object built and initialized by this plugin class.
    */
-  graph::core::CollisionCheckerPtr collision_checker_;
+  graph::collision_check::MoveitCollisionCheckerPtr collision_checker_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -77,7 +78,7 @@ public:
    * @brief getCollisionChecker return the graph::core::CollisionCheckerPtr object built by the plugin.
    * @return the graph::core::CollisionCheckerPtr object built.
    */
-  graph::core::CollisionCheckerPtr getCollisionChecker()
+  graph::collision_check::MoveitCollisionCheckerPtr getCollisionChecker()
   {
     return collision_checker_;
   }

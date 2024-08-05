@@ -241,5 +241,7 @@ public:
 
 };
 
+
+
 } //namespace collision_check
 } //namespace graph
