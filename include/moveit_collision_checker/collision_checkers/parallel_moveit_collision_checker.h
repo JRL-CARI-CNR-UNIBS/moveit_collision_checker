@@ -1,6 +1,6 @@
 #pragma once
 /*
-Copyright (c) 2019, Manuel Beschi CNR-STIIMA manuel.beschi@stiima.cnr.it
+Copyright (c) 2024, Manuel Beschi and Cesare Tonola, UNIBS and CNR-STIIMA, manuel.beschi@unibs.it, c.tonola001@unibs.it
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,8 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 #include <moveit_collision_checker/collision_checkers/moveit_collision_checker.h>
-#include <thread>
-#include <future>
+#include <moveit_collision_checker/collision_checkers/BS_thread_pool.hpp> //Credit: Barak Shoshany https://github.com/bshoshany/thread-pool.git
 #include <mutex>
 
 namespace graph
@@ -45,7 +44,7 @@ namespace collision_check
  * @brief Implementation of a parallel collision checker using MoveIt! library for multi-threaded collision checking.
  *
  * This class extends the MoveitCollisionChecker and adds parallel collision checking functionality
- * by distributing collision checks across multiple threads.
+ * by distributing collision checks across multiple threads using a threads pool.
  */
 class ParallelMoveitCollisionChecker;
 typedef std::shared_ptr<ParallelMoveitCollisionChecker> ParallelMoveitCollisionCheckerPtr;
@@ -55,6 +54,11 @@ class ParallelMoveitCollisionChecker: public MoveitCollisionChecker
 #define GROUP_SIZE 10
 
 protected:
+
+  /**
+   * @brief pool_ The threads pool.
+   */
+  std::shared_ptr<BS::thread_pool> pool_;
 
   /**
    * @brief threads_num_   Number of parallel threads for collision checking.
@@ -80,11 +84,6 @@ protected:
    * @brief queues_ Queues for storing joint configurations to be checked.
    */
   std::vector<std::vector<std::vector<double>>> queues_;
-
-  /**
-   * @brief threads_ Vector of threads for parallel collision checking.
-   */
-  std::vector<std::thread> threads_;
 
   /**
    * @brief planning_scenes_ Vector of PlanningScene objects for each thread.

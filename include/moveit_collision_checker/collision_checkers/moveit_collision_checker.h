@@ -1,6 +1,6 @@
 #pragma once
 /*
-Copyright (c) 2019, Manuel Beschi CNR-STIIMA manuel.beschi@stiima.cnr.it
+Copyright (c) 2024, Manuel Beschi and Cesare Tonola, UNIBS and CNR-STIIMA, manuel.beschi@unibs.it, c.tonola001@unibs.it
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -198,14 +198,15 @@ public:
     for (size_t ij=0;ij<joint_names_.size();ij++)
       state_->setJointPositions(joint_models_.at(ij),&configuration(ij));
 
+    state_->update();
+    //    state_->updateCollisionBodyTransforms(); update() already calls it
 
     if (!state_->satisfiesBounds(jmg_))
     {
       CNR_DEBUG(logger_,"Out of bound");
       return false;
     }
-    state_->update();
-    state_->updateCollisionBodyTransforms();
+
     return !planning_scene_->isStateColliding(*state_,group_name_);
   }
 
