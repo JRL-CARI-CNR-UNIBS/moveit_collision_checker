@@ -51,7 +51,7 @@ class MoveitCollisionCheckerBasePlugin: std::enable_shared_from_this<MoveitColli
 protected:
 
   /**
-   * @brief collision_checker_ is the graph::core::CollisionCheckerBase object built and initialized by this plugin class.
+   * @brief collision_checker_ is the graph::collision_check::MoveitCollisionCheckerPtr object built and initialized by this plugin class.
    */
   graph::collision_check::MoveitCollisionCheckerPtr collision_checker_;
 
@@ -59,7 +59,7 @@ public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
   /**
-   * @brief Empty constructor for CollisionCheckerBase. The function init() must be called afterwards.
+   * @brief Empty constructor for MoveitCollisionCheckerBasePlugin. The function init() must be called afterwards.
    */
   MoveitCollisionCheckerBasePlugin()
   {
@@ -75,8 +75,8 @@ public:
   }
 
   /**
-   * @brief getCollisionChecker return the graph::core::CollisionCheckerPtr object built by the plugin.
-   * @return the graph::core::CollisionCheckerPtr object built.
+   * @brief getCollisionChecker return the graph::collision_check::MoveitCollisionCheckerPtr object built by the plugin.
+   * @return the graph::collision_check::MoveitCollisionCheckerPtr object built.
    */
   graph::collision_check::MoveitCollisionCheckerPtr getCollisionChecker()
   {
@@ -84,7 +84,7 @@ public:
   }
 
   /**
-   * @brief init Initialise the graph::core::CollisionCheckerBase object, defining its main attributes.
+   * @brief init Initialise the graph::collision_check::MoveitCollisionCheckerPtr object, defining its main attributes.
    * @param param_ns defines the namespace under which parameter are searched for using cnr_param library. MoveitCollisionChecker requires group_name and checker_resolution as parameters.
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param logger Pointer to a TraceLogger for logging.
