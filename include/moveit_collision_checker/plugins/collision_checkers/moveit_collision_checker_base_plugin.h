@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cnr_class_loader/register_macro.hpp>
 #include <moveit/planning_scene/planning_scene.h>
 #include <graph_core/collision_checkers/collision_checker_base.h>
+#include <moveit_collision_checker/collision_checkers/moveit_collision_checker.h>
 
 namespace graph
 {
@@ -50,9 +51,9 @@ class MoveitCollisionCheckerBasePlugin: std::enable_shared_from_this<MoveitColli
 protected:
 
   /**
-   * @brief collision_checker_ is the graph::core::CollisionCheckerBase object built and initialized by this plugin class.
+   * @brief collision_checker_ is the graph::collision_check::MoveitCollisionCheckerPtr collision_checker_ object built and initialized by this plugin class.
    */
-  graph::core::CollisionCheckerPtr collision_checker_;
+  graph::collision_check::MoveitCollisionCheckerPtr collision_checker_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -74,16 +75,16 @@ public:
   }
 
   /**
-   * @brief getCollisionChecker return the graph::core::CollisionCheckerPtr object built by the plugin.
-   * @return the graph::core::CollisionCheckerPtr object built.
+   * @brief getCollisionChecker return the graph::collision_check::MoveitCollisionCheckerPtr object built by the plugin.
+   * @return the graph::collision_check::MoveitCollisionCheckerPtr object built.
    */
-  graph::core::CollisionCheckerPtr getCollisionChecker()
+  graph::collision_check::MoveitCollisionCheckerPtr getCollisionChecker()
   {
     return collision_checker_;
   }
 
   /**
-   * @brief init Initialise the graph::core::CollisionCheckerBase object, defining its main attributes.
+   * @brief init Initialise the graph::collision_check::MoveitCollisionCheckerPtr object, defining its main attributes.
    * @param param_ns defines the namespace under which parameter are searched for using cnr_param library. MoveitCollisionChecker requires group_name and checker_resolution as parameters.
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
    * @param logger Pointer to a TraceLogger for logging.
