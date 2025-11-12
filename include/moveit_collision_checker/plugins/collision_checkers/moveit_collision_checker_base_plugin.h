@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <rclcpp/rclcpp.hpp>
 #include <moveit_msgs/msg/planning_scene.hpp>
 #include <cnr_class_loader/register_macro.hpp>
-#include <moveit/planning_scene/planning_scene.h>
+#include <moveit/planning_scene/planning_scene.hpp>
 #include <graph_core/collision_checkers/collision_checker_base.h>
 #include <moveit_collision_checker/collision_checkers/moveit_collision_checker.h>
 
