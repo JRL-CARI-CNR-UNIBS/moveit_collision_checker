@@ -53,23 +53,23 @@ public:
 
   /**
    * @brief init Initialise the graph::collision_check::ParallelMoveitCollisionChecker object, defining its main attributes.
-   * @param param_ns defines the namespace under which parameter are searched for using cnr_param library.
+   * @param params parameters of the checker (see graph_core/params.h).
    * @param planning_scene Pointer to the MoveIt! PlanningScene.
-   * @param logger Pointer to a TraceLogger for logging.
+   * @param logger Logger (see graph_core/logger.h).
    * @return True if correctly initialised, False if already initialised.
    */
-  virtual bool init(const std::string& param_ns,
+  virtual bool init(const graph::core::ParamMap& params,
                     const planning_scene::PlanningScenePtr& planning_scene,
-                    const cnr_logger::TraceLoggerPtr& logger) override
+                    const graph::core::LoggerPtr& logger) override
   {
     double checker_resolution;
-    graph::core::get_param(logger,param_ns,"checker_resolution",checker_resolution,0.01);
+    graph::core::get_param(logger, params, "checker_resolution",checker_resolution,0.01);
 
     std::string group_name;
-    graph::core::get_param(logger,param_ns,"group_name",group_name,(std::string)"manipulator");
+    graph::core::get_param(logger, params, "group_name",group_name,(std::string)"manipulator");
 
     int parallel_checker_n_threads = 4;
-    graph::core::get_param(logger,param_ns,"parallel_checker_n_threads",parallel_checker_n_threads,4);
+    graph::core::get_param(logger, params, "parallel_checker_n_threads",parallel_checker_n_threads,4);
 
     collision_checker_ = std::make_shared<graph::collision_check::ParallelMoveitCollisionChecker>(planning_scene,group_name,logger,parallel_checker_n_threads,checker_resolution);
 

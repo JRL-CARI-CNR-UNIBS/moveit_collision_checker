@@ -94,13 +94,11 @@ protected:
   std::vector<const moveit::core::JointModel*> mimic_joint_models_;
 
   /**
-   * @brief Pointer to a TraceLogger instance for logging.
+   * @brief Pointer to the logger.
    *
-   * This member variable represents a pointer to a TraceLogger instance, allowing
-   * to perform logging operations. TraceLogger is a part of the cnr_logger library.
-   * Ensure that the logger is properly configured and available for use.
+   * Logger used for messages (see graph_core/logger.h); it can be null.
    */
-  cnr_logger::TraceLoggerPtr logger_;
+  graph::core::LoggerPtr logger_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -120,7 +118,7 @@ public:
    */
   MoveitCollisionChecker(const planning_scene::PlanningScenePtr& planning_scene,
                          const std::string& group_name,
-                         const cnr_logger::TraceLoggerPtr& logger,
+                         const graph::core::LoggerPtr& logger,
                          const double& min_distance = 0.01):
     CollisionCheckerBase(logger,min_distance), //set init_ true
     planning_scene_(planning_scene),
@@ -134,7 +132,7 @@ public:
     mimic_joint_models_=jmg_->getMimicJointModels();
 
     if (!planning_scene_)
-      CNR_ERROR(logger_,"Invalid planning scene");
+      GC_ERROR(logger_,"Invalid planning scene");
   }
 
   /**
@@ -146,7 +144,7 @@ public:
    */
   virtual bool init(const planning_scene::PlanningScenePtr& planning_scene,
                     const std::string& group_name,
-                    const cnr_logger::TraceLoggerPtr& logger,
+                    const graph::core::LoggerPtr& logger,
                     const double& min_distance = 0.01)
   {
     if(not CollisionCheckerBase::init(logger,min_distance))
@@ -162,7 +160,7 @@ public:
     mimic_joint_models_=jmg_->getMimicJointModels();
 
     if (!planning_scene_)
-      CNR_ERROR(logger_,"Invalid planning scene");
+      GC_ERROR(logger_,"Invalid planning scene");
 
     return true;
   }
@@ -175,7 +173,7 @@ public:
   virtual void setPlanningSceneMsg(const moveit_msgs::msg::PlanningScene& msg)
   {
     if (!planning_scene_->usePlanningSceneMsg(msg))
-      CNR_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
+      GC_ERROR_THROTTLE(logger_,1,"Unable to upload scene");
   }
 
   /**
@@ -207,7 +205,7 @@ public:
 
     if (!state_->satisfiesBounds(jmg_))
     {
-      CNR_DEBUG(logger_,"Out of bound");
+      GC_DEBUG(logger_,"Out of bound");
       return false;
     }
 

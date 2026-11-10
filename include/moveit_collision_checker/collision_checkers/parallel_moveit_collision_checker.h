@@ -162,7 +162,7 @@ public:
    */
   ParallelMoveitCollisionChecker(const planning_scene::PlanningScenePtr& planning_scene,
                                  const std::string& group_name,
-                                 const cnr_logger::TraceLoggerPtr& logger,
+                                 const graph::core::LoggerPtr& logger,
                                  const int& threads_num=4,
                                  const double& min_distance = 0.01);
 
@@ -182,7 +182,7 @@ public:
    */
   virtual bool init(const planning_scene::PlanningScenePtr& planning_scene,
                     const std::string& group_name,
-                    const cnr_logger::TraceLoggerPtr& logger,
+                    const graph::core::LoggerPtr& logger,
                     const int& threads_num=4,
                     const double& min_distance = 0.0);
 
