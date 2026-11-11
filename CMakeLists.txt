@@ -35,7 +35,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC graph_core::graph_core)
  target_include_directories(${PROJECT_NAME} PUBLIC
    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
    $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
- ament_target_dependencies(${PROJECT_NAME} PUBLIC rclcpp moveit_core)
+ target_link_libraries(${PROJECT_NAME} PUBLIC ${rclcpp_TARGETS} ${moveit_core_TARGETS})
  
  ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
  ament_export_dependencies(graph_core rclcpp moveit_core)
